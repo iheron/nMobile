@@ -18,6 +18,8 @@ import 'package:nmobile/helpers/ipfs.dart';
 import 'package:nmobile/helpers/memory_cache.dart';
 import 'package:nmobile/services/task.dart';
 
+import 'private_group/prvaite_group.dart';
+
 GetIt locator = GetIt.instance;
 
 late Application application;
@@ -40,6 +42,7 @@ late SessionCommon sessionCommon;
 late ChatCommon chatCommon;
 late ChatInCommon chatInCommon;
 late ChatOutCommon chatOutCommon;
+late PrivateGroupCommon privateGroupCommon;
 
 void setupLocator() {
   // register
@@ -63,6 +66,7 @@ void setupLocator() {
   locator.registerSingleton(ChatCommon());
   locator.registerSingleton(ChatInCommon());
   locator.registerSingleton(ChatOutCommon());
+  locator.registerSingleton(PrivateGroupCommon());
 
   // instance
   application = locator.get<Application>();
@@ -85,4 +89,5 @@ void setupLocator() {
   chatCommon = locator.get<ChatCommon>();
   chatInCommon = locator.get<ChatInCommon>();
   chatOutCommon = locator.get<ChatOutCommon>();
+  privateGroupCommon = locator.get<PrivateGroupCommon>();
 }

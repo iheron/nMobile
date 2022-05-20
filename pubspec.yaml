@@ -16,15 +16,6 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 
-# 22/04/08
-#version: 1.2.8+256
-# 22/04/12
-#version: 1.2.9+257
-# 22/04/19
-#version: 1.2.10+258
-# 22/04/20
-#version: 1.2.11+259
-# 22/06/01
 version: 1.3.0+263
 
 environment:
@@ -46,9 +37,10 @@ dependencies:
   path_provider: ^2.0.3
   shared_preferences: ^2.0.7
   url_launcher: ^6.0.2
-  #  webview_flutter: ^2.0.12
 
   # common
+  fixnum: ^1.0.1
+  convert: ^3.0.1
   flutter_bloc: ^7.2.0
   equatable: ^2.0.3
   synchronized: ^3.0.0
@@ -61,9 +53,7 @@ dependencies:
   vibration: ^1.7.3
   flutter_local_notifications: ^8.2.0
   background_fetch: ^1.0.1
-  #  get: ^4.3.8
-  #  provider: ^6.0.0
-  #  auto_route: ^2.3.0
+  cryptography: ^2.0.5
 
   # log
   logger: ^1.1.0
@@ -86,20 +76,6 @@ dependencies:
   flutter_spinkit: ^5.1.0
   flutter_markdown: ^0.6.6
   flutter_slidable: ^0.6.0
-  #  flutter_screenutil: ^5.0.0+2
-  #  flutter_native_splash: ^1.2.2
-  #  fluttertoast: ^8.0.8
-  #  fl_chart: ^0.40.0
-  #  auto_size_text: ^2.1.0
-  #  flutter_swiper: ^1.1.6
-  #  modal_bottom_sheet: ^2.0.0
-  #  badges: ^2.0.1
-  #  timeline_tile: ^2.0.0
-
-  # list
-  #  pull_to_refresh: ^2.0.0
-  #  infinite_scroll_pagination: ^3.1.0
-  #  flutter_staggered_grid_view: ^0.4.0
 
   # icon
   flutter_svg: ^0.22.0
@@ -116,16 +92,12 @@ dependencies:
   camera: ^0.9.4+24
   photo_view: ^0.12.0
   flutter_image_compress: ^1.0.0
-  image_cropper: ^1.4.1
+  image_cropper: ^2.0.2
   wechat_assets_picker: ^7.1.1
   wechat_camera_picker: ^3.1.0
-  #  flutter_luban: ^0.1.13
-  #  octo_image: ^1.0.0+1
 
   # audio
   flutter_sound: ^8.3.10
-  #  audioplayers: ^0.19.1
-  #  just_audio: ^0.9.10
 
   # video
   video_player: ^2.4.2
@@ -141,13 +113,6 @@ dependencies:
   # plugins
   nkn_sdk_flutter:
     path: ./plugins/nkn-sdk-flutter
-
-#dependency_overrides:
-#  sqflite:
-#    git:
-#      url: https://www.github.com/davidmartos96/sqflite_sqlcipher.git
-#      path: sqflite
-#      ref: fmdb_override
 
 dev_dependencies:
   flutter_test:
