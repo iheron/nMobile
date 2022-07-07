@@ -8,14 +8,16 @@ import 'package:nmobile/schema/option.dart';
 import 'package:nmobile/utils/path.dart';
 import 'package:nmobile/utils/util.dart';
 
+import '../utils/logger.dart';
+
 class ContactType {
   static const me = -1;
   static const none = 0;
   static const stranger = 1;
   static const friend = 2;
-  // static const String stranger = 'stranger';
-  // static const String friend = 'friend';
-  // static const String me = 'me';
+// static const String stranger = 'stranger';
+// static const String friend = 'friend';
+// static const String me = 'me';
 }
 
 class RequestType {
@@ -91,14 +93,19 @@ class ContactSchema {
 
   static getDefaultName(String? clientAddress) {
     if (clientAddress == null || clientAddress.isEmpty) return null;
-    String defaultName;
-    var index = clientAddress.lastIndexOf('.');
-    if (index < 0) {
-      defaultName = clientAddress.substring(0, 6);
-    } else {
-      defaultName = clientAddress.substring(0, index + 7);
+    try {
+      String defaultName;
+      var index = clientAddress.lastIndexOf('.');
+      if (index < 0) {
+        defaultName = clientAddress.substring(0, 6);
+      } else {
+        defaultName = clientAddress.substring(0, index + 7);
+      }
+      return defaultName;
+    } catch (e) {
+      logger.e(e);
+      return clientAddress;
     }
-    return defaultName;
   }
 
   // TODO:GG check pubKey

@@ -64,7 +64,7 @@ PODS:
   - FMDB/standard (2.7.5)
   - image_cropper (0.0.4):
     - Flutter
-    - TOCropViewController (~> 2.6.0)
+    - TOCropViewController (~> 2.6.1)
   - image_gallery_saver (1.5.0):
     - Flutter
   - image_picker (0.0.1):
@@ -278,7 +278,7 @@ SPEC CHECKSUMS:
   flutter_sound: ba7daf658dea78e9f18b79657338bfc222489f4f
   flutter_sound_core: d9396f10752a0df9aa3197f4c431d62d934918cc
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
-  image_cropper: f1668dd8d2cad2d357955caad15a40547856edcb
+  image_cropper: 60c2789d1f1a78c873235d4319ca0c34a69f2d98
   image_gallery_saver: 259eab68fb271cfd57d599904f7acdc7832e7ef2
   image_picker: 0d37d1cb66231c2473a0e3ccb8d062d0c2b3d297
   libwebp: 98a37e597e40bfdb4c911fc98f2c53d0b12d05fc
@@ -312,4 +312,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: ee4776229d6f4b4479ec0339af3f8eca11a85570
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3

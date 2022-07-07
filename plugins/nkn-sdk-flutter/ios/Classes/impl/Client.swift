@@ -100,9 +100,37 @@ class Client : ChannelBase, IChannelHandler, FlutterStreamHandler {
                 config.seedRPCServerAddr?.append(v)
             }
         }
-        // config.rpcConcurrency = 4
 
         var error: NSError?
+
+        let ethResolverConfig: EthresolverConfig = EthresolverConfig()
+        ethResolverConfig.rpcServer = "https://rinkeby.infura.io/v3/a7cc9467bd2644609b12cbc3625329c8"
+        ethResolverConfig.contractAddress = "0x968c18e96e2151Ea3cA77118531947E9405F789D"
+        config.resolvers = NkngomobileNewResolverArrayFromResolver(EthResolver(config: ethResolverConfig))
+        
+        let oneResolverConfig: EthresolverConfig = EthresolverConfig()
+        oneResolverConfig.prefix = "ONE:"
+        oneResolverConfig.rpcServer = "https://api.harmony.one"
+        oneResolverConfig.contractAddress = "0x1ff7F20f6db039C3c65ae4bC3C52c2cAEB36ab7e"
+        config.resolvers?.append(EthResolver(config: oneResolverConfig))
+        
+        let iotxResolverConfig: EthresolverConfig = EthresolverConfig()
+        iotxResolverConfig.prefix = "IOTX:"
+        iotxResolverConfig.rpcServer = "https://babel-api.testnet.iotex.io"
+        iotxResolverConfig.contractAddress = "0x1e811343025e9f4b70fe7e5fe545f1d16bc1beeb"
+        config.resolvers?.append(EthResolver(config: iotxResolverConfig))
+        
+        let tfuelResolverConfig: EthresolverConfig = EthresolverConfig()
+        tfuelResolverConfig.prefix = "TFUEL:"
+        tfuelResolverConfig.rpcServer = "https://eth-rpc-api.thetatoken.org/rpc"
+        tfuelResolverConfig.contractAddress = "0x1ff7f20f6db039c3c65ae4bc3c52c2caeb36ab7e"
+        config.resolvers?.append(EthResolver(config: tfuelResolverConfig))
+        
+        let dnsResolverConfig: DnsresolverConfig = DnsresolverConfig()
+        dnsResolverConfig.dnsServer = "1.1.1.1:53"
+        config.resolvers?.append(DnsResolver(config: dnsResolverConfig))
+
+
         let account = NknNewAccount(seed?.data, &error)!
         if (error != nil) {
             self.resultError(result: result, error: error)

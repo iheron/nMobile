@@ -21,12 +21,12 @@ import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 class MediaPicker {
   static Future<List<Map<String, dynamic>>> pickCommons(
-    List<String> savePaths, {
-    bool compressImage = false,
-    bool compressAudio = false,
-    bool compressVideo = false,
-    int? maxSize,
-  }) async {
+      List<String> savePaths, {
+        bool compressImage = false,
+        bool compressAudio = false,
+        bool compressVideo = false,
+        int? maxSize,
+      }) async {
     // maxNum
     int maxNum = savePaths.length;
     if (maxNum > 9) maxNum = 9;
@@ -159,12 +159,12 @@ class MediaPicker {
   }
 
   static Future<Map<String, dynamic>?> takeCommon(
-    String? savePath, {
-    bool compressImage = false,
-    bool compressAudio = false,
-    bool compressVideo = false,
-    Duration maxDuration = const Duration(seconds: 10),
-  }) async {
+      String? savePath, {
+        bool compressImage = false,
+        bool compressAudio = false,
+        bool compressVideo = false,
+        Duration maxDuration = const Duration(seconds: 10),
+      }) async {
     // permission
     bool permissionOK = await _isPermissionOK(ImageSource.camera);
     if (!permissionOK) return null;
@@ -273,8 +273,8 @@ class MediaPicker {
         "name": null,
         "fileExt": ext.isEmpty ? null : ext,
         "mimeType": mimetype,
-        "width": (Platform.isAndroid && isImage) ? null : entity.orientatedWidth,
-        "height": (Platform.isAndroid && isImage) ? null : entity.orientatedHeight,
+        "width": entity.orientatedWidth,
+        "height": entity.orientatedHeight,
       };
       if (isAudio || isVideo) {
         params.addAll({"duration": entity.duration});
@@ -336,7 +336,7 @@ class MediaPicker {
     }
 
     // compress
-    pickedFile = await compressImageBySize(pickedFile, maxSize: maxSize ?? 0, bestSize: bestSize ?? 0, toast: true);
+    pickedFile = await _compressImageBySize(pickedFile, maxSize: maxSize ?? 0, bestSize: bestSize ?? 0, toast: true);
     if (pickedFile == null) {
       logger.w('MediaPicker - pickImage - compress = null');
       return null;
@@ -371,24 +371,27 @@ class MediaPicker {
     // crop
     File? cropFile;
     try {
-      cropFile = await ImageCropper.cropImage(
+      CroppedFile? croppedFile = await ImageCropper().cropImage(
         sourcePath: original.absolute.path,
         cropStyle: cropStyle,
         aspectRatio: cropRatio,
-        compressQuality: 100, // later handle
+        compressQuality: 100,
+        // later handle
         maxWidth: null,
         maxHeight: null,
-        iosUiSettings: IOSUiSettings(
-          title: 'Cropper',
-          minimumAspectRatio: 1.0,
-        ),
-        androidUiSettings: AndroidUiSettings(
-          toolbarTitle: 'Cropper',
-          toolbarColor: application.theme.primaryColor,
-          toolbarWidgetColor: Colors.white,
-          initAspectRatio: CropAspectRatioPreset.original,
-          lockAspectRatio: false,
-        ),
+        uiSettings: [
+          IOSUiSettings(
+            title: 'Cropper',
+            minimumAspectRatio: 1.0,
+          ),
+          AndroidUiSettings(
+            toolbarTitle: 'Cropper',
+            toolbarColor: application.theme.primaryColor,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false,
+          )
+        ],
       );
     } catch (e) {
       handleError(e);
@@ -399,7 +402,7 @@ class MediaPicker {
     return cropFile;
   }
 
-  static Future<File?> compressImageBySize(File? original, {String? savePath, int maxSize = 0, int bestSize = 0, bool force = false, bool toast = false}) async {
+  static Future<File?> _compressImageBySize(File? original, {int maxSize = 0, int bestSize = 0, bool toast = false}) async {
     if (original == null) return null;
     bool isGif = (mime(original.path)?.indexOf('image/gif') ?? -1) >= 0;
     // size
@@ -411,7 +414,12 @@ class MediaPicker {
       return original;
     } else if (maxEnable && !bestEnable) {
       if (originalSize <= maxSize) {
-        logger.i('MediaPicker - _compressImage - ok with only maxSize - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - maxSize:${Format.flowSize(maxSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])}');
+        logger.i('MediaPicker - _compressImage - ok with only maxSize - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: [
+          'B',
+          'KB',
+          'MB',
+          'GB'
+        ])} - maxSize:${Format.flowSize(maxSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])}');
         return original;
       } else if (isGif) {
         if (toast) Toast.show(Global.locale((s) => s.file_too_big));
@@ -421,7 +429,12 @@ class MediaPicker {
       }
     } else if (!maxEnable && bestEnable) {
       if (originalSize <= bestSize) {
-        logger.i('MediaPicker - _compressImage - ok with only bestSize - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - bestSize:${Format.flowSize(bestSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])}');
+        logger.i('MediaPicker - _compressImage - ok with only bestSize - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: [
+          'B',
+          'KB',
+          'MB',
+          'GB'
+        ])} - bestSize:${Format.flowSize(bestSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])}');
         return original;
       } else if (isGif) {
         return original;
@@ -430,7 +443,17 @@ class MediaPicker {
       }
     } else if (maxEnable && bestEnable) {
       if ((originalSize <= bestSize) && (originalSize <= maxSize)) {
-        logger.i('MediaPicker - _compressImage - ok with size - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - bestSize:${Format.flowSize(bestSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - maxSize:${Format.flowSize(maxSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])}');
+        logger.i('MediaPicker - _compressImage - ok with size - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: [
+          'B',
+          'KB',
+          'MB',
+          'GB'
+        ])} - bestSize:${Format.flowSize(bestSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - maxSize:${Format.flowSize(maxSize.toDouble(), unitArr: [
+          'B',
+          'KB',
+          'MB',
+          'GB'
+        ])}');
         return original;
       } else if (isGif) {
         if (originalSize > maxSize) {
@@ -443,11 +466,21 @@ class MediaPicker {
         // go compress
       }
     }
-    logger.i('MediaPicker - _compressImage - compress:START - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - bestSize:${Format.flowSize(bestSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - maxSize:${Format.flowSize(maxSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])}');
+    logger.i('MediaPicker - _compressImage - compress:START - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: [
+      'B',
+      'KB',
+      'MB',
+      'GB'
+    ])} - bestSize:${Format.flowSize(bestSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - maxSize:${Format.flowSize(maxSize.toDouble(), unitArr: [
+      'B',
+      'KB',
+      'MB',
+      'GB'
+    ])}');
 
     // filePath
     String fileExt = Path.getFileExt(original, FileHelper.DEFAULT_IMAGE_EXT);
-    String compressPath = savePath ?? (await Path.getRandomFile(null, DirType.cache, fileExt: fileExt));
+    String compressPath = await Path.getRandomFile(null, DirType.cache, fileExt: fileExt);
     // format
     CompressFormat? format;
     if (compressPath.toLowerCase().endsWith(".jpg") || compressPath.toLowerCase().endsWith(".jpeg")) {
@@ -460,7 +493,7 @@ class MediaPicker {
       format = CompressFormat.webp;
     }
     if (format == null) {
-      logger.w('MediaPicker - _compressImage - compress:FAIL - CompressFormatError - compressPath:$compressPath');
+      logger.w('MediaPicker - _compressImage - compress:FAIL - CompressFormatError - fileExt:$fileExt - compressPath:$compressPath');
       return original;
     }
 
@@ -468,9 +501,12 @@ class MediaPicker {
     File? compressFile;
     int compressSize = 0;
     try {
-      List<int> qualityItems = force ? [30, 15, 3] : [70, 30, 15];
-      for (var i = 0; i < qualityItems.length; i++) {
-        int compressQuality = qualityItems[i];
+      int offsetQuality = 20;
+      int tryTimes = 0;
+      int compressQuality = 100;
+      while (compressQuality > offsetQuality) {
+        tryTimes++;
+        compressQuality = 90 - tryTimes * offsetQuality;
         compressFile = await FlutterImageCompress.compressAndGetFile(
           original.absolute.path,
           compressPath,
@@ -481,7 +517,17 @@ class MediaPicker {
           keepExif: false, // true -> ios error
         );
         compressSize = await compressFile?.length() ?? 0;
-        logger.d('MediaPicker - _compressImage - compress:OK - tryTimes:${i + 1} - quality:$compressQuality - compressSize:${Format.flowSize(compressSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - bestSize:${Format.flowSize(bestSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - maxSize:${Format.flowSize(maxSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])}');
+        logger.d('MediaPicker - _compressImage - compress:OK - tryTimes:$tryTimes - quality:$compressQuality - compressSize:${Format.flowSize(compressSize.toDouble(), unitArr: [
+          'B',
+          'KB',
+          'MB',
+          'GB'
+        ])} - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - bestSize:${Format.flowSize(bestSize.toDouble(), unitArr: [
+          'B',
+          'KB',
+          'MB',
+          'GB'
+        ])} - maxSize:${Format.flowSize(maxSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])}');
         if (compressSize <= bestSize) break;
       }
     } catch (e) {
@@ -489,11 +535,31 @@ class MediaPicker {
     }
 
     if (compressSize > maxSize) {
-      logger.w('MediaPicker - _compressImage - compress:BREAK - compressSize:${Format.flowSize(compressSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - bestSize:${Format.flowSize(bestSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - maxSize:${Format.flowSize(maxSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - format:$format - path:${compressFile?.path}');
+      logger.w('MediaPicker - _compressImage - compress:BREAK - compressSize:${Format.flowSize(compressSize.toDouble(), unitArr: [
+        'B',
+        'KB',
+        'MB',
+        'GB'
+      ])} - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - bestSize:${Format.flowSize(bestSize.toDouble(), unitArr: [
+        'B',
+        'KB',
+        'MB',
+        'GB'
+      ])} - maxSize:${Format.flowSize(maxSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - format:$format - path:${compressFile?.path}');
       if (toast) Toast.show(Global.locale((s) => s.file_too_big));
       return null;
     }
-    logger.i('MediaPicker - _compressImage - compress:END - compressSize:${Format.flowSize(compressSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - bestSize:${Format.flowSize(bestSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - maxSize:${Format.flowSize(maxSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - format:$format - path:${compressFile?.path}');
+    logger.i('MediaPicker - _compressImage - compress:END - compressSize:${Format.flowSize(compressSize.toDouble(), unitArr: [
+      'B',
+      'KB',
+      'MB',
+      'GB'
+    ])} - originalSize:${Format.flowSize(originalSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - bestSize:${Format.flowSize(bestSize.toDouble(), unitArr: [
+      'B',
+      'KB',
+      'MB',
+      'GB'
+    ])} - maxSize:${Format.flowSize(maxSize.toDouble(), unitArr: ['B', 'KB', 'MB', 'GB'])} - format:$format - path:${compressFile?.path}');
     return compressFile;
   }
 

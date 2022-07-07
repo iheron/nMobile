@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:nkn_sdk_flutter/client.dart';
 import 'package:nmobile/app.dart';
 import 'package:nmobile/blocs/wallet/wallet_bloc.dart';
 import 'package:nmobile/blocs/wallet/wallet_state.dart';
@@ -567,7 +569,7 @@ class _ChatHomeScreenState extends BaseStateFulWidgetState<ChatHomeScreen> with 
                               title: Global.locale((s) => s.new_whisper, ctx: context),
                               inputTip: Global.locale((s) => s.send_to, ctx: context),
                               inputHint: Global.locale((s) => s.enter_or_select_a_user_pubkey, ctx: context),
-                              validator: Validator.of(context).identifierNKN(),
+                              // validator: Validator.of(context).identifierNKN(),
                               contactSelect: true,
                             );
                             if (address?.isNotEmpty == true) {
