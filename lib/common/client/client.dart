@@ -215,11 +215,11 @@ class ClientCommon with Tag {
       logger.w("$TAG - _signIn - wait network ok");
       await Future.delayed(Duration(milliseconds: 500));
     }
-    // password
+    // password (allow empty string if stored password is empty)
     try {
-      if ((password == null) || password.isEmpty) {
+      if (password == null) {
         logger.w("$TAG - _signIn - password is null - wallet:$wallet");
-        return {"client": null, "canTry": false}; // , "text": "password empty"
+        return {"client": null, "canTry": false};
       }
       if (!(await walletCommon.isPasswordRight(wallet.address, password))) {
         logger.w("$TAG - _signIn - password error - wallet:$wallet");

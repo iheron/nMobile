@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:nkn_sdk_flutter/client.dart';
+import 'package:nkn_sdk_flutter/utils/hex.dart';
 import 'package:nkn_sdk_flutter/wallet.dart';
 import 'package:nmobile/app.dart';
 import 'package:nmobile/blocs/settings/settings_bloc.dart';
@@ -18,6 +19,9 @@ import 'package:nmobile/helpers/error.dart';
 import 'package:nmobile/native/common.dart';
 import 'package:nmobile/native/crypto.dart';
 import 'package:nmobile/routes/routes.dart';
+import 'package:nmobile/schema/wallet.dart';
+import 'package:nmobile/storages/settings.dart' as settings_storage;
+import 'package:nmobile/storages/wallet.dart';
 import 'package:nmobile/utils/logger.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -51,6 +55,29 @@ void main() async {
     await Settings.init();
   });
   await application.initialize();
+
+  // Auto create default wallet on first launch
+  try {
+    final createdFlag = await settings_storage.SettingsStorage.getSettings(settings_storage.SettingsStorage.DEFAULT_WALLET_CREATED);
+    if (!(createdFlag == true || createdFlag?.toString() == 'true')) {
+      // create NKN wallet with empty password
+      final Wallet nkn = await Wallet.create(null, config: WalletConfig(password: ''));
+      if (nkn.address.isNotEmpty && nkn.keystore.isNotEmpty) {
+        final WalletStorage walletStorage = WalletStorage();
+        final WalletSchema wallet = WalletSchema(
+          type: WalletType.nkn,
+          address: nkn.address,
+          publicKey: hexEncode(nkn.publicKey),
+          name: 'Default Account',
+        );
+        await walletStorage.add(wallet, nkn.keystore, '', hexEncode(nkn.seed));
+        await walletStorage.setDefaultAddress(wallet.address);
+        await settings_storage.SettingsStorage.setSettings(settings_storage.SettingsStorage.DEFAULT_WALLET_CREATED, true);
+      }
+    }
+  } catch (e, st) {
+    handleError(e, st, upload: false);
+  }
 
   if (Settings.sentryEnable) {
     await SentryFlutter.init(
