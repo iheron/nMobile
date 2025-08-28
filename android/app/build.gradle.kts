@@ -72,7 +72,9 @@ dependencies {
     implementation("androidx.window:window:1.3.0")
     implementation("androidx.window:window-java:1.3.0")
     // google
-    implementation("com.google.firebase:firebase-messaging:24.1.1")
+    implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-messaging")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     implementation("com.squareup.okhttp3:okhttp-tls:4.10.0")

@@ -1,5 +1,6 @@
 import UIKit
 import Flutter
+import Firebase
 import receive_sharing_intent
 
 @main
@@ -9,6 +10,8 @@ import receive_sharing_intent
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         super.application(application, didFinishLaunchingWithOptions: launchOptions)
+        
+        FirebaseApp.configure()
         
         if #available(iOS 10.0, *) {
             UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
