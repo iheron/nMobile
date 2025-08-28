@@ -4079,6 +4079,26 @@ class S {
       args: [],
     );
   }
+
+  /// `Block`
+  String get block {
+    return Intl.message(
+      'Block',
+      name: 'block',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `After enabling, messages from this user will be blocked.`
+  String get block_tips {
+    return Intl.message(
+      'After enabling, messages from this user will be blocked.',
+      name: 'block_tips',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

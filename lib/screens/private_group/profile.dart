@@ -408,7 +408,7 @@ class _PrivateGroupProfileScreenState extends BaseStateFulWidgetState<PrivateGro
                       _isOwner
                           ? CupertinoSwitch(
                               value: _burnOpen,
-                              activeColor: application.theme.primaryColor,
+                        activeTrackColor: application.theme.primaryColor,
                               onChanged: (value) {
                                 setState(() {
                                   _burnOpen = value;

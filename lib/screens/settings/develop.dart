@@ -73,7 +73,7 @@ class _SettingsDevelopScreenState extends BaseStateFulWidgetState<SettingsDevelo
                             children: <Widget>[
                               CupertinoSwitch(
                                   value: _bubbleEnable,
-                                  activeColor: application.theme.primaryColor,
+                                  activeTrackColor: application.theme.primaryColor,
                                   onChanged: (bool value) async {
                                     Settings.messageDebugInfo = value;
                                     SettingsStorage.setSettings('${SettingsStorage.OPEN_DEVELOP_OPTIONS_MESSAGE_DEBUG}', value);

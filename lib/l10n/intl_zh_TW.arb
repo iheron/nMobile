@@ -420,5 +420,7 @@
   "allow_uploading_application_exception_logs": "允許上傳應用異常日誌",
   "do_not_allow_uploading_application_exception_logs": "不允許上傳應用異常日誌",
   "developer_options": "开发人员选项",
-  "message_debug_info": "消息调试信息"
+  "message_debug_info": "消息调试信息",
+  "block": "屏蔽",
+  "block_tips": "啟用後，將封鎖對方的訊息。"
 }

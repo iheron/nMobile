@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:nmobile/app.dart';
 import 'package:nmobile/common/locator.dart';
@@ -114,6 +115,7 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
   int _burnProgress = -1;
 
   bool _notificationOpen = false;
+  bool _blocked = false;
 
   bool _profileFetched = false;
 
@@ -129,6 +131,7 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
     _updateContactSubscription = contactCommon.updateStream.where((event) => event.address == _contact?.address).listen((ContactSchema event) {
       _initBurning(event);
       _initNotification(event);
+      _initBlocked(event);
       setState(() {
         _contact = event;
       });
@@ -170,6 +173,7 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
 
     _initBurning(this._contact);
     _initNotification(this._contact);
+    await _initBlocked(this._contact);
 
     setState(() {});
 
@@ -204,6 +208,13 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
       } else {
         _notificationOpen = false;
       }
+    }
+  }
+
+  _initBlocked(ContactSchema? schema) async {
+    if (schema?.isMe == false) {
+      bool b = await contactCommon.isBlocked(schema?.address);
+      _blocked = b;
     }
   }
 
@@ -864,7 +875,7 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
                     Spacer(),
                     CupertinoSwitch(
                       value: _burnOpen,
-                      activeColor: application.theme.primaryColor,
+                      activeTrackColor: application.theme.primaryColor,
                       onChanged: (value) {
                         setState(() {
                           _burnOpen = value;
@@ -958,7 +969,7 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
                 Spacer(),
                 CupertinoSwitch(
                   value: _notificationOpen,
-                  activeColor: application.theme.primaryColor,
+                  activeTrackColor: application.theme.primaryColor,
                   onChanged: (value) {
                     setState(() {
                       _notificationOpen = value;
@@ -974,6 +985,45 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
             child: Label(
               Settings.locale((s) => s.accept_notification, ctx: context),
               type: LabelType.bodySmall,
+              fontWeight: FontWeight.w600,
+              softWrap: true,
+            ),
+          ),
+          SizedBox(height: 28),
+
+          /// block (blacklist)
+          TextButton(
+            style: _buttonStyle(topRadius: true, botRadius: true, topPad: 8, botPad: 8),
+            onPressed: () {},
+            child: Row(
+              children: <Widget>[
+                Icon(FontAwesomeIcons.userSlash, size: 24, color: application.theme.fallColor),
+                SizedBox(width: 10),
+                Label(
+                  Settings.locale((s) => s.block, ctx: context),
+                  type: LabelType.bodyRegular,
+                  color: application.theme.fallColor,
+                ),
+                Spacer(),
+                CupertinoSwitch(
+                  value: _blocked,
+                  activeTrackColor: application.theme.fallColor,
+                  onChanged: (value) async {
+                    setState(() {
+                      _blocked = value;
+                    });
+                    await contactCommon.setBlocked(_contact?.address, value, notify: true);
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 6, left: 20, right: 20),
+            child: Label(
+              Settings.locale((s) => s.block_tips, ctx: context),
+              type: LabelType.bodySmall,
+              color: application.theme.fallColor,
               fontWeight: FontWeight.w600,
               softWrap: true,
             ),
@@ -1011,7 +1061,7 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
           _contact?.type != ContactType.friend
               ? Column(
                   children: [
-                    SizedBox(height: 10),
+                    SizedBox(height: 28),
                     TextButton(
                       style: _buttonStyle(topRadius: true, botRadius: true, topPad: 12, botPad: 12),
                       onPressed: () {
@@ -1035,7 +1085,7 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
               : SizedBox.shrink(),
 
           /// delete
-          (_contact?.type == ContactType.friend) || (_contact?.type == ContactType.stranger)
+          (_contact?.type == ContactType.friend)
               ? Column(
                   children: [
                     SizedBox(height: 28),

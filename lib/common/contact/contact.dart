@@ -422,6 +422,31 @@ class ContactCommon with Tag {
     return data;
   }
 
+  Future<bool> isBlocked(String? address) async {
+    if (address == null || address.isEmpty) return false;
+    ContactSchema? contact = await query(address, fetchWalletAddress: false);
+    if (contact == null) return false;
+    var value = contact.data['blocked'];
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    String str = value?.toString().toLowerCase() ?? "";
+    return str == "1" || str == "true";
+  }
+
+  Future<Map<String, dynamic>?> setBlocked(String? address, bool blocked, {bool notify = false}) async {
+    if (address == null || address.isEmpty) return null;
+    Map<String, dynamic>? data = await ContactStorage.instance.setData(address, {
+      "blocked": blocked ? 1 : 0,
+    });
+    if (data != null) {
+      logger.i("$TAG - setBlocked - success - blocked:$blocked - data:$data - address:$address");
+      if (notify) queryAndNotify(address);
+    } else {
+      logger.w("$TAG - setBlocked - fail - blocked:$blocked - data:$data - address:$address");
+    }
+    return data;
+  }
+
   Future queryAndNotify(String? address) async {
     if (address == null || address.isEmpty) return;
     ContactSchema? updated = await query(address);

@@ -70,6 +70,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "back": MessageLookupByLibrary.simpleMessage("后退"),
         "balance_not_enough": MessageLookupByLibrary.simpleMessage("余额不足"),
         "biometrics": MessageLookupByLibrary.simpleMessage("生物识别"),
+        "block": MessageLookupByLibrary.simpleMessage("屏蔽"),
+        "block_tips": MessageLookupByLibrary.simpleMessage("启用后，将屏蔽对方的消息。"),
         "blocked_user_disallow_invite":
             MessageLookupByLibrary.simpleMessage("该用户已经被拉黑，不允许普通成员邀请"),
         "burn_10_minutes": MessageLookupByLibrary.simpleMessage("10 分钟"),

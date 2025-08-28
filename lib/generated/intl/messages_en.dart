@@ -78,6 +78,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "balance_not_enough":
             MessageLookupByLibrary.simpleMessage("Balance not enough"),
         "biometrics": MessageLookupByLibrary.simpleMessage("Biometrics"),
+        "block": MessageLookupByLibrary.simpleMessage("Block"),
+        "block_tips": MessageLookupByLibrary.simpleMessage(
+            "After enabling, messages from this user will be blocked."),
         "blocked_user_disallow_invite": MessageLookupByLibrary.simpleMessage(
             "The user has been blocked, and ordinary members are not allowed to invite"),
         "burn_10_minutes": MessageLookupByLibrary.simpleMessage("10 minutes"),

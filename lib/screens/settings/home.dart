@@ -317,7 +317,7 @@ class _SettingsHomeScreenState extends BaseStateFulWidgetState<SettingsHomeScree
                           children: <Widget>[
                             CupertinoSwitch(
                                 value: _biometricsSelected,
-                                activeColor: application.theme.primaryColor,
+                                activeTrackColor: application.theme.primaryColor,
                                 onChanged: (bool value) async {
                                   WalletSchema? _wallet = await walletCommon.getDefault();
                                   if (_wallet == null || _wallet.address.isEmpty) {

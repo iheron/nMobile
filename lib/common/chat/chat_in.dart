@@ -167,6 +167,12 @@ class ChatInCommon with Tag {
           }
         }
       }
+      bool blocked = await contactCommon.isBlocked(received.sender);
+      if (blocked) {
+        logger.w("$TAG - _handleMessage - blocked - store as deleted - sender:${received.sender} - targetId:${received.targetId} - type:${received.contentType}");
+        received.isDelete = true;
+        received.deleteAt = DateTime.now().millisecondsSinceEpoch;
+      }
       // receive
       switch (received.contentType) {
         case MessageContentType.ping:
