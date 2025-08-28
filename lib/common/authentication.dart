@@ -64,7 +64,7 @@ class Authorization {
       String? pwd;
       try {
         pwd = await walletCommon.getPassword(walletAddress);
-        if (!authOk || pwd == null || pwd.isEmpty) {
+        if (!authOk || pwd == null) {
           onInput?.call(true);
           String? password = await BottomDialog.of(Settings.appContext).showInput(
             title: Settings.locale((s) => s.verify_wallet_password),
