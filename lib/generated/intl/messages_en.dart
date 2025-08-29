@@ -271,6 +271,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "expiration": MessageLookupByLibrary.simpleMessage("Expiration"),
         "expired": MessageLookupByLibrary.simpleMessage("Expired"),
         "export": MessageLookupByLibrary.simpleMessage("Export"),
+        "export_contacts":
+            MessageLookupByLibrary.simpleMessage("Export Contacts"),
         "export_wallet": MessageLookupByLibrary.simpleMessage("Export Account"),
         "face_id": MessageLookupByLibrary.simpleMessage("Face ID"),
         "failure": MessageLookupByLibrary.simpleMessage("Failure"),
@@ -303,6 +305,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Enter wallet name"),
         "hours": MessageLookupByLibrary.simpleMessage("hours"),
         "image": MessageLookupByLibrary.simpleMessage("Image"),
+        "import_contacts":
+            MessageLookupByLibrary.simpleMessage("Import Contacts"),
         "import_ethereum_wallet":
             MessageLookupByLibrary.simpleMessage("Import Ethereum Account"),
         "import_nkn_wallet":

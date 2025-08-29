@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:nmobile/common/locator.dart';
 import 'package:nmobile/common/settings.dart';
 import 'package:nmobile/components/base/stateful.dart';
@@ -24,7 +26,11 @@ import 'package:nmobile/screens/contact/add.dart';
 import 'package:nmobile/screens/contact/home_empty.dart';
 import 'package:nmobile/screens/contact/profile.dart';
 import 'package:nmobile/utils/asset.dart';
+import 'package:nmobile/utils/util.dart';
 import 'package:nmobile/utils/time.dart';
+
+import '../../helpers/error.dart';
+import 'package:nmobile/utils/contact_io.dart';
 
 class ContactHomeScreen extends BaseStateFulWidget {
   static const String routeName = '/contact/home';
@@ -80,6 +86,58 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
   /*List<ContactSchema> _searchStrangers = <ContactSchema>[];*/
   List<TopicSchema> _searchTopics = <TopicSchema>[];
   List<PrivateGroupSchema> _searchGroups = <PrivateGroupSchema>[];
+
+  Future<void> _exportContacts() async {
+    try {
+      Loading.show();
+      String? path = await ContactIO.exportFriendsAsJson();
+      Loading.dismiss();
+      if (path == null) {
+        Toast.show(Settings.locale((s) => s.something_went_wrong, ctx: context));
+        return;
+      }
+      Toast.show(Settings.locale((s) => s.success, ctx: context));
+      Util.launchFile(path);
+    } catch (e, st) {
+      Loading.dismiss();
+      handleError(e, st);
+      Toast.show(Settings.locale((s) => s.something_went_wrong, ctx: context));
+    }
+  }
+
+  Future<void> _importContacts() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        type: Platform.isAndroid ? FileType.any : FileType.custom,
+        allowedExtensions: Platform.isAndroid ? null : ["json"],
+      );
+      if (result == null || result.files.isEmpty) return;
+      String? path = result.files.first.path;
+      if (path == null) return;
+      File picked = File(path);
+      if (!path.toLowerCase().endsWith('.json')) {
+        if (!mounted) return;
+        Toast.show(Settings.locale((s) => s.something_went_wrong, ctx: Settings.appContext));
+        return;
+      }
+      if (!await picked.exists()) {
+        if (!mounted) return;
+        Toast.show(Settings.locale((s) => s.file_not_exist, ctx: Settings.appContext));
+        return;
+      }
+      Loading.show();
+      int imported = await ContactIO.importContactsFromJsonFile(picked);
+      Loading.dismiss();
+      if (!mounted) return;
+      Toast.show('${Settings.locale((s) => s.success, ctx: Settings.appContext)} ($imported)');
+    } catch (e, st) {
+      Loading.dismiss();
+      handleError(e, st);
+      if (!mounted) return;
+      Toast.show(Settings.locale((s) => s.something_went_wrong, ctx: Settings.appContext));
+    }
+  }
 
   @override
   void onRefreshArguments() {
@@ -337,7 +395,28 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
             onPressed: () {
               ContactAddScreen.go(context);
             },
-          )
+          ),
+          PopupMenuButton<int>(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            icon: Asset.iconSvg('more', color: application.theme.backgroundLightColor, width: 24),
+            onSelected: (int result) {
+              if (result == 0) {
+                _exportContacts();
+              } else if (result == 1) {
+                _importContacts();
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+              PopupMenuItem<int>(
+                value: 0,
+                child: Label(Settings.locale((s) => s.export_contacts, ctx: context), type: LabelType.display),
+              ),
+              PopupMenuItem<int>(
+                value: 1,
+                child: Label(Settings.locale((s) => s.import_contacts, ctx: context), type: LabelType.display),
+              ),
+            ],
+          ),
         ],
       ),
       body: GestureDetector(

@@ -221,6 +221,9 @@
   "contact_no_contact_title": "You haven’t got any\n contacts yet",
   "contact_no_contact_desc": "Use your contact list to quickly message and\n send funds to your friends.",
 
+  "export_contacts": "Export Contacts",
+  "import_contacts": "Import Contacts",
+
   "type_a_message": "Type a message",
   "pictures": "Pictures",
   "album": "Album",

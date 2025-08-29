@@ -221,6 +221,9 @@
   "contact_no_contact_title": "您還沒有聯繫人",
   "contact_no_contact_desc": "使用您的聯繫人列表快速發送消息和資金。",
 
+  "export_contacts": "導出聯繫人",
+  "import_contacts": "導入聯繫人",
+
   "type_a_message": "請輸入",
   "pictures": "圖片",
   "album": "相冊",

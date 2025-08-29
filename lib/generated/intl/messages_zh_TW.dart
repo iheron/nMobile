@@ -228,6 +228,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "expiration": MessageLookupByLibrary.simpleMessage("過期時間"),
         "expired": MessageLookupByLibrary.simpleMessage("已過期"),
         "export": MessageLookupByLibrary.simpleMessage("導出"),
+        "export_contacts": MessageLookupByLibrary.simpleMessage("導出聯繫人"),
         "export_wallet": MessageLookupByLibrary.simpleMessage("導出賬戶"),
         "face_id": MessageLookupByLibrary.simpleMessage("Face ID"),
         "failure": MessageLookupByLibrary.simpleMessage("失敗"),
@@ -255,6 +256,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "hint_enter_wallet_name": MessageLookupByLibrary.simpleMessage("賬戶名稱"),
         "hours": MessageLookupByLibrary.simpleMessage("小時"),
         "image": MessageLookupByLibrary.simpleMessage("圖片"),
+        "import_contacts": MessageLookupByLibrary.simpleMessage("導入聯繫人"),
         "import_ethereum_wallet":
             MessageLookupByLibrary.simpleMessage("導入以太坊賬戶"),
         "import_nkn_wallet": MessageLookupByLibrary.simpleMessage("導入主網賬戶"),

@@ -2090,6 +2090,26 @@ class S {
     );
   }
 
+  /// `Export Contacts`
+  String get export_contacts {
+    return Intl.message(
+      'Export Contacts',
+      name: 'export_contacts',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Import Contacts`
+  String get import_contacts {
+    return Intl.message(
+      'Import Contacts',
+      name: 'import_contacts',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Type a message`
   String get type_a_message {
     return Intl.message(
