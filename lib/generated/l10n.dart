@@ -4119,6 +4119,26 @@ class S {
       args: [],
     );
   }
+
+  /// `Revoke`
+  String get revoke {
+    return Intl.message(
+      'Revoke',
+      name: 'revoke',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to revoke this message?`
+  String get confirm_revoke {
+    return Intl.message(
+      'Are you sure you want to revoke this message?',
+      name: 'confirm_revoke',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

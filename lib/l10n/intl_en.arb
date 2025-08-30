@@ -425,5 +425,7 @@
   "developer_options": "developer options",
   "message_debug_info": "message debug information",
   "block": "Block",
-  "block_tips": "After enabling, messages from this user will be blocked."
+  "block_tips": "After enabling, messages from this user will be blocked.",
+  "revoke": "Revoke",
+  "confirm_revoke": "Are you sure you want to revoke this message?"
 }

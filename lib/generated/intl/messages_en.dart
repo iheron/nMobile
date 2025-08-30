@@ -147,6 +147,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Confirm Password"),
         "confirm_resend":
             MessageLookupByLibrary.simpleMessage("Confirm resend?"),
+        "confirm_revoke": MessageLookupByLibrary.simpleMessage(
+            "Are you sure you want to revoke this message?"),
         "confirm_unsubscribe_group": MessageLookupByLibrary.simpleMessage(
             "Are you sure you want to leave the group chat?"),
         "connect": MessageLookupByLibrary.simpleMessage("Connect"),
@@ -504,6 +506,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "rename": MessageLookupByLibrary.simpleMessage("Rename"),
         "request_processed": MessageLookupByLibrary.simpleMessage(
             "Requests still being processed, please try again later"),
+        "revoke": MessageLookupByLibrary.simpleMessage("Revoke"),
         "save": MessageLookupByLibrary.simpleMessage("Save"),
         "save_contact": MessageLookupByLibrary.simpleMessage("Save Contact"),
         "save_to_album": MessageLookupByLibrary.simpleMessage("Save To Album"),

@@ -297,6 +297,9 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
     }
 
     var onTap = _onTapBubble(contentType);
+    var onLongPress = () {
+      _showPopupMenu(includeCopy: contentType == MessageContentType.text || contentType == MessageContentType.textExtension);
+    };
 
     List<Widget> childs = [SizedBox.shrink()];
     switch (contentType) {
@@ -325,6 +328,7 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
     return GestureDetector(
       key: _contentKey,
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Container(
         constraints: BoxConstraints(maxWidth: maxWidth),
         padding: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 5),
@@ -345,27 +349,7 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
     switch (contentType) {
       case MessageContentType.text:
       case MessageContentType.textExtension:
-        onTap = () {
-          PopMenu.PopupMenu popupMenu = PopMenu.PopupMenu(
-            context: context,
-            items: [
-              PopMenu.MenuItem(
-                userInfo: 0,
-                title: Settings.locale((s) => s.copy, ctx: context),
-                textStyle: TextStyle(color: application.theme.fontLightColor, fontSize: 12),
-              ),
-            ],
-            onClickMenu: (PopMenu.MenuItemProvider item) {
-              var index = (item as PopMenu.MenuItem).userInfo;
-              switch (index) {
-                case 0:
-                  Util.copyText(_message.content?.toString() ?? "");
-                  break;
-              }
-            },
-          );
-          popupMenu.show(widgetKey: _contentKey);
-        };
+        onTap = () => _showPopupMenu(includeCopy: true);
         break;
       case MessageContentType.image:
         // image + ipfs_image
@@ -444,6 +428,90 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
         break;
     }
     return onTap;
+  }
+
+  void _showPopupMenu({bool includeCopy = false}) {
+    List<PopMenu.MenuItem> items = [];
+    if (includeCopy) {
+      items.add(PopMenu.MenuItem(
+        userInfo: 0,
+        title: Settings.locale((s) => s.copy, ctx: context),
+        textStyle: TextStyle(color: application.theme.fontLightColor, fontSize: 12),
+      ));
+    }
+    items.add(PopMenu.MenuItem(
+      userInfo: 100,
+      title: Settings.locale((s) => s.delete, ctx: context),
+      textStyle: TextStyle(color: application.theme.fontLightColor, fontSize: 12),
+    ));
+    if (_message.isOutbound) {
+      items.add(PopMenu.MenuItem(
+        userInfo: 101,
+        title: Settings.locale((s) => s.revoke, ctx: context),
+        textStyle: TextStyle(color: application.theme.fontLightColor, fontSize: 12),
+      ));
+    }
+    PopMenu.PopupMenu popupMenu = PopMenu.PopupMenu(
+      context: context,
+      items: items,
+      onClickMenu: (PopMenu.MenuItemProvider item) async {
+        var index = (item as PopMenu.MenuItem).userInfo;
+        switch (index) {
+          case 0:
+            Util.copyText(_message.content?.toString() ?? "");
+            break;
+          case 100:
+            ModalDialog.of(Settings.appContext).confirm(
+              title: Settings.locale((s) => s.delete_message_confirm_title, ctx: context),
+              agree: Button(
+                width: double.infinity,
+                text: Settings.locale((s) => s.delete, ctx: context),
+                backgroundColor: application.theme.strongColor,
+                onPressed: () async {
+                  await messageCommon.messageDelete(_message, notify: true);
+                  if (Navigator.of(this.context).canPop()) Navigator.pop(this.context);
+                },
+              ),
+              reject: Button(
+                width: double.infinity,
+                text: Settings.locale((s) => s.cancel, ctx: context),
+                fontColor: application.theme.fontColor2,
+                backgroundColor: application.theme.backgroundLightColor,
+                onPressed: () {
+                  if (Navigator.of(this.context).canPop()) Navigator.pop(this.context);
+                },
+              ),
+            );
+            break;
+          case 101:
+            ModalDialog.of(Settings.appContext).confirm(
+              title: Settings.locale((s) => s.tip, ctx: context),
+              content: Settings.locale((s) => s.confirm_revoke, ctx: context),
+              agree: Button(
+                width: double.infinity,
+                text: Settings.locale((s) => s.revoke, ctx: context),
+                backgroundColor: application.theme.strongColor,
+                onPressed: () async {
+                  bool ok = await chatOutCommon.sendRevoke(_message.msgId);
+                  if (ok) await messageCommon.messageDelete(_message, notify: true);
+                  if (Navigator.of(this.context).canPop()) Navigator.pop(this.context);
+                },
+              ),
+              reject: Button(
+                width: double.infinity,
+                text: Settings.locale((s) => s.cancel, ctx: context),
+                fontColor: application.theme.fontColor2,
+                backgroundColor: application.theme.backgroundLightColor,
+                onPressed: () {
+                  if (Navigator.of(this.context).canPop()) Navigator.pop(this.context);
+                },
+              ),
+            );
+            break;
+        }
+      },
+    );
+    popupMenu.show(widgetKey: _contentKey);
   }
 
   Widget _widgetBubbleInfoBottom() {

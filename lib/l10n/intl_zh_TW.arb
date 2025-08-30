@@ -425,5 +425,7 @@
   "developer_options": "开发人员选项",
   "message_debug_info": "消息调试信息",
   "block": "屏蔽",
-  "block_tips": "啟用後，將封鎖對方的訊息。"
+  "block_tips": "啟用後，將封鎖對方的訊息。",
+  "revoke": "撤回",
+  "confirm_revoke": "確定要撤回此消息嗎？"
 }

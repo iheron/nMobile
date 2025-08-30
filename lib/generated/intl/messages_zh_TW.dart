@@ -125,6 +125,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("確定要刪除備註頭像嗎?"),
         "confirm_password": MessageLookupByLibrary.simpleMessage("確認密碼"),
         "confirm_resend": MessageLookupByLibrary.simpleMessage("確認重新發送？"),
+        "confirm_revoke": MessageLookupByLibrary.simpleMessage("確定要撤回此消息嗎？"),
         "confirm_unsubscribe_group":
             MessageLookupByLibrary.simpleMessage("確定要退出群聊嗎？"),
         "connect": MessageLookupByLibrary.simpleMessage("連接"),
@@ -417,6 +418,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "rename": MessageLookupByLibrary.simpleMessage("修改"),
         "request_processed":
             MessageLookupByLibrary.simpleMessage("還有正在處理的請求，請稍後再試"),
+        "revoke": MessageLookupByLibrary.simpleMessage("撤回"),
         "save": MessageLookupByLibrary.simpleMessage("保存"),
         "save_contact": MessageLookupByLibrary.simpleMessage("保存聯系人"),
         "save_to_album": MessageLookupByLibrary.simpleMessage("保存到相冊"),

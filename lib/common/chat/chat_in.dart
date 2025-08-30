@@ -18,6 +18,8 @@ import 'package:nmobile/utils/logger.dart';
 import 'package:nmobile/utils/parallel_queue.dart';
 import 'package:nmobile/utils/path.dart';
 
+import '../../storages/message.dart';
+
 class ChatInCommon with Tag {
   ChatInCommon();
 
@@ -234,6 +236,9 @@ class ChatInCommon with Tag {
           break;
         case MessageContentType.topicKickOut:
           await _receiveTopicKickOut(received);
+          break;
+        case MessageContentType.revoke:
+          await _receiveRevoke(received);
           break;
         case MessageContentType.privateGroupInvitation:
           insertOk = await _receivePrivateGroupInvitation(received);
@@ -946,6 +951,25 @@ class ChatInCommon with Tag {
       if (item != null) members.add(item);
     }
     await privateGroupCommon.updatePrivateGroupMembers(received.sender, groupId, version, members);
+  }
+
+  Future<bool> _receiveRevoke(MessageSchema received) async {
+    // content is target msgId
+    String? targetMsgId = received.content?.toString();
+    if (targetMsgId == null || targetMsgId.isEmpty) return false;
+    MessageSchema? target = await messageCommon.query(targetMsgId);
+    if (target == null) return false;
+    // Only sender can revoke
+    String sender = received.sender;
+    bool isSameSender = target.isOutbound
+        ? (clientCommon.address == sender)
+        : (target.sender == sender);
+    if (!isSameSender) return false;
+    // Soft delete first
+    await MessageStorage.instance.updateIsDelete(target.msgId, true);
+    // Optional: deep delete pieces/content
+    await messageCommon.messageDelete(target, notify: true);
+    return true;
   }
 
   Future<int> _deletePieces(String msgId) async {

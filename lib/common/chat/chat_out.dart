@@ -865,6 +865,41 @@ class ChatOutCommon with Tag {
     return await _sendVisible(message, maxHoldingSeconds: maxHoldingSeconds);
   }
 
+  Future<bool> sendRevoke(String msgId) async {
+    if (msgId.isEmpty) return false;
+    // Only allow sender to revoke
+    MessageSchema? origin = await messageCommon.query(msgId);
+    if (origin == null || !origin.isOutbound) return false;
+
+    String targetId = origin.targetId;
+    int targetType = origin.targetType;
+    // Build revoke message schema per target type
+    MessageSchema revoke = MessageSchema.fromSend(
+      targetId,
+      targetType,
+      MessageContentType.revoke,
+      msgId,
+    );
+    // no DB persistence for revoke command
+    revoke.data = MessageData.getRevoke(msgId);
+
+    // Send according to targetType
+    Uint8List? pid;
+    if (targetType == SessionType.TOPIC) {
+      TopicSchema? topic = TopicSchema.create(targetId, type: SessionType.TOPIC);
+      pid = await _sendWithTopic(topic, revoke, notification: false);
+    } else if (targetType == SessionType.PRIVATE_GROUP) {
+      PrivateGroupSchema? group = PrivateGroupSchema.create(targetId, targetId, type: SessionType.PRIVATE_GROUP);
+      pid = await _sendWithPrivateGroup(group, revoke, notification: false);
+    } else {
+      ContactSchema? contact = await chatCommon.contactHandle(revoke);
+      pid = await _sendWithContact(contact, revoke, notification: false);
+    }
+    bool ok = pid?.isNotEmpty == true;
+    logger.i("$TAG - sendRevoke - type:$targetType - dest:$targetId - msgId:$msgId - ok:$ok");
+    return ok;
+  }
+
   Future<MessageSchema?> saveIpfs(dynamic target, Map<String, dynamic> data) async {
     // content
     String contentPath = data["path"]?.toString() ?? "";
