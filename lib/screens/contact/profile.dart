@@ -852,6 +852,33 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
           ),
           SizedBox(height: 28),
 
+          /// sendMsg
+          TextButton(
+            style: _buttonStyle(topRadius: true, botRadius: true, topPad: 12, botPad: 12),
+            onPressed: () {
+              _updateBurnIfNeed();
+              ChatMessagesScreen.go(this.context, _contact);
+            },
+            child: Row(
+              children: <Widget>[
+                Asset.iconSvg('chat', color: application.theme.primaryColor, width: 24),
+                SizedBox(width: 10),
+                Label(
+                  Settings.locale((s) => s.send_message, ctx: context),
+                  type: LabelType.bodyRegular,
+                  color: application.theme.fontColor1,
+                ),
+                Spacer(),
+                Asset.iconSvg(
+                  'right',
+                  width: 24,
+                  color: application.theme.fontColor2,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 28),
+
           /// burn
           TextButton(
             style: _buttonStyle(topRadius: true, botRadius: true, topPad: 8, botPad: 8),
@@ -1028,34 +1055,6 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
               softWrap: true,
             ),
           ),
-          SizedBox(height: 28),
-
-          /// sendMsg
-          TextButton(
-            style: _buttonStyle(topRadius: true, botRadius: true, topPad: 12, botPad: 12),
-            onPressed: () {
-              _updateBurnIfNeed();
-              ChatMessagesScreen.go(this.context, _contact);
-            },
-            child: Row(
-              children: <Widget>[
-                Asset.iconSvg('chat', color: application.theme.primaryColor, width: 24),
-                SizedBox(width: 10),
-                Label(
-                  Settings.locale((s) => s.send_message, ctx: context),
-                  type: LabelType.bodyRegular,
-                  color: application.theme.fontColor1,
-                ),
-                Spacer(),
-                Asset.iconSvg(
-                  'right',
-                  width: 24,
-                  color: application.theme.fontColor2,
-                ),
-              ],
-            ),
-          ),
-          // SizedBox(height: 28),
 
           /// AddContact
           _contact?.type != ContactType.friend
