@@ -41,6 +41,8 @@ import 'package:nmobile/utils/parallel_queue.dart';
 import 'package:nmobile/utils/path.dart' as Path2;
 import 'package:nmobile/utils/time.dart';
 
+import '../../components/chat/emoji_picker.dart';
+
 class ChatMessagesScreen extends BaseStateFulWidget {
   static const String routeName = '/chat/messages';
   static final String argTarget = "target";
@@ -103,9 +105,12 @@ class _ChatMessagesScreenState extends BaseStateFulWidgetState<ChatMessagesScree
   Timer? _delRefreshTimer;
 
   bool _showBottomMenu = false;
+  bool _showEmojiPicker = false;
 
   bool _showRecordLock = false;
   bool _showRecordLockLocked = false;
+
+  final TextEditingController _inputController = TextEditingController();
 
   @override
   void onRefreshArguments() {
@@ -436,6 +441,9 @@ class _ChatMessagesScreenState extends BaseStateFulWidgetState<ChatMessagesScree
     if (mounted) FocusScope.of(context).requestFocus(FocusNode());
     setState(() {
       _showBottomMenu = !_showBottomMenu;
+      if (_showBottomMenu) {
+        _showEmojiPicker = false;
+      }
     });
   }
 
@@ -443,6 +451,7 @@ class _ChatMessagesScreenState extends BaseStateFulWidgetState<ChatMessagesScree
     if (mounted) FocusScope.of(context).requestFocus(FocusNode());
     setState(() {
       _showBottomMenu = false;
+      _showEmojiPicker = false;
     });
   }
 
@@ -826,16 +835,25 @@ class _ChatMessagesScreenState extends BaseStateFulWidgetState<ChatMessagesScree
               ChatSendBar(
                 targetId: this._targetId,
                 disableTip: disableTip,
+                controller: _inputController,
                 onMenuPressed: () {
                   _toggleBottomMenu();
+                },
+                onEmojiPressed: () {
+                  if (mounted) FocusScope.of(context).requestFocus(FocusNode());
+                  setState(() {
+                    _showBottomMenu = false;
+                    _showEmojiPicker = !_showEmojiPicker;
+                  });
                 },
                 onSendPress: (String content) {
                   return chatOutCommon.sendText(this._target, content); // await
                 },
                 onInputFocus: (bool focus) {
-                  if (focus && _showBottomMenu) {
+                  if (focus) {
                     setState(() {
                       _showBottomMenu = false;
+                      _showEmojiPicker = false;
                     });
                   }
                 },
@@ -926,6 +944,11 @@ class _ChatMessagesScreenState extends BaseStateFulWidgetState<ChatMessagesScree
                       },
                     )
                   : SizedBox.shrink(),
+              isClientSendOk ? EmojiPickerBottomMenu(
+                target: _targetId,
+                show: _showEmojiPicker,
+                controller: _inputController,
+              ) : SizedBox.shrink(),
             ],
           ),
         ),

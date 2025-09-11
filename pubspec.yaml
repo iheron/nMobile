@@ -91,6 +91,7 @@ dependencies:
   flutter_svg: ^1.1.6
   font_awesome_flutter: ^10.3.0
   cupertino_icons: ^1.0.5
+  emoji_picker_flutter: ^4.3.0
 
   # list
   pull_to_refresh: ^2.0.0

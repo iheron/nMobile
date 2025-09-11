@@ -20,22 +20,26 @@ class ChatSendBar extends BaseStateFulWidget {
   final String? targetId;
   final String? disableTip;
   final VoidCallback? onMenuPressed;
+  final VoidCallback? onEmojiPressed;
   final Function(String)? onSendPress;
   final Function(bool)? onInputFocus;
   final Function(bool, bool, int)? onRecordTap;
   final Function(bool, bool)? onRecordLock;
   final Stream<Map<String, dynamic>>? onChangeStream;
+  final TextEditingController? controller;
 
   ChatSendBar({
     Key? key,
     required this.targetId,
     this.disableTip,
     this.onMenuPressed,
+    this.onEmojiPressed,
     this.onSendPress,
     this.onInputFocus,
     this.onRecordTap,
     this.onRecordLock,
     this.onChangeStream,
+    this.controller,
   }) : super(key: key);
 
   @override
@@ -48,8 +52,9 @@ class _ChatSendBarState extends BaseStateFulWidgetState<ChatSendBar> {
 
   StreamSubscription? _onChangeSubscription;
   StreamSubscription? _onRecordProgressSubscription;
-  TextEditingController _inputController = TextEditingController();
+  late TextEditingController _inputController;
   FocusNode _inputFocusNode = FocusNode();
+  VoidCallback? _inputControllerListener;
 
   String? _draft;
   bool _canSendText = false;
@@ -66,7 +71,22 @@ class _ChatSendBarState extends BaseStateFulWidgetState<ChatSendBar> {
   @override
   void initState() {
     super.initState();
+    _inputController = widget.controller ?? TextEditingController();
     // input
+    _inputControllerListener = () {
+      String draft = _inputController.text;
+      if (draft.isNotEmpty) {
+        memoryCache.setDraft(widget.targetId, draft);
+      } else {
+        memoryCache.removeDraft(widget.targetId);
+      }
+      if (mounted) {
+        setState(() {
+          _canSendText = draft.isNotEmpty;
+        });
+      }
+    };
+    _inputController.addListener(_inputControllerListener!);
     _onChangeSubscription = widget.onChangeStream?.listen((event) {
       String? type = event["type"];
       if (type == null || type.isEmpty) return;
@@ -75,9 +95,6 @@ class _ChatSendBarState extends BaseStateFulWidgetState<ChatSendBar> {
       } else if (type == ChatSendBar.ChangeTypeAppend) {
         _inputController.text += event["content"] ?? "";
       }
-      setState(() {
-        _canSendText = _inputController.text.isNotEmpty;
-      });
     });
     _inputFocusNode.addListener(() {
       widget.onInputFocus?.call(_inputFocusNode.hasFocus);
@@ -118,6 +135,9 @@ class _ChatSendBarState extends BaseStateFulWidgetState<ChatSendBar> {
   void dispose() {
     _onRecordProgressSubscription?.cancel();
     _onChangeSubscription?.cancel();
+    if (_inputControllerListener != null) {
+      _inputController.removeListener(_inputControllerListener!);
+    }
     super.dispose();
   }
 
@@ -369,6 +389,18 @@ class _ChatSendBarState extends BaseStateFulWidgetState<ChatSendBar> {
                                     hintText: Settings.locale((s) => s.type_a_message, ctx: context),
                                     hintStyle: TextStyle(color: _theme.fontColor2),
                                     contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                                    prefixIcon: GestureDetector(
+                                      onTap: widget.onEmojiPressed,
+                                      behavior: HitTestBehavior.opaque,
+                                      child: Padding(
+                                        padding: EdgeInsets.only(left: 8, top: 4),
+                                        child: FaIcon(
+                                          FontAwesomeIcons.faceSmile,
+                                          color: application.theme.primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                    prefixIconConstraints: BoxConstraints(minHeight: 32, minWidth: 32),
                                     border: UnderlineInputBorder(
                                       borderRadius: BorderRadius.all(Radius.circular(20)),
                                       borderSide: const BorderSide(width: 0, style: BorderStyle.none),
@@ -379,17 +411,7 @@ class _ChatSendBarState extends BaseStateFulWidgetState<ChatSendBar> {
                                   controller: _inputController,
                                   focusNode: _inputFocusNode,
                                   textInputAction: TextInputAction.newline,
-                                  onChanged: (val) {
-                                    String draft = _inputController.text;
-                                    if (draft.isNotEmpty) {
-                                      memoryCache.setDraft(widget.targetId, draft);
-                                    } else {
-                                      memoryCache.removeDraft(widget.targetId);
-                                    }
-                                    setState(() {
-                                      _canSendText = val.isNotEmpty;
-                                    });
-                                  },
+                                  onChanged: null,
                                 ),
                               ),
                             ],

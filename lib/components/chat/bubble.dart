@@ -343,6 +343,7 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
           child: GestureDetector(
             key: _contentKey,
             behavior: HitTestBehavior.opaque,
+            onTap: onTap,
             onLongPressStart: (_) => _openMenu(),
             child: Container(
               constraints: BoxConstraints(maxWidth: maxWidth),
