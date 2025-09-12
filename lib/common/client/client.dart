@@ -340,7 +340,7 @@ class ClientCommon with Tag {
       await chatInCommon.waitReceiveQueues("_signOut"); // wait db_insert from onMessage
       await chatInCommon.pause(reset: closeDB);
       client = null;
-      if (clearWallet) BlocProvider.of<WalletBloc>(Settings.appContext).add(DefaultWallet(null));
+
       if (closeDB) await dbCommon.close();
       return true;
     } catch (e, st) {

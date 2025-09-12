@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -32,6 +33,8 @@ import 'package:nmobile/utils/asset.dart';
 import 'package:nmobile/utils/logger.dart';
 import 'package:nmobile/utils/path.dart';
 import 'package:nmobile/utils/util.dart';
+
+import '../../providers/connected_provider.dart';
 
 class ContactProfileScreen extends BaseStateFulWidget {
   static const String routeName = '/contact/profile';
@@ -258,6 +261,11 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
         ContactSchema? _me = await contactCommon.getMe(canAdd: true, fetchWalletAddress: true);
         await _refreshContactSchema(schema: _me);
         contactCommon.meUpdateSink.add(_me);
+      } else {
+        try {
+          final container = ProviderScope.containerOf(context, listen: false);
+          container.read(connectedProvider.notifier).setConnected(false);
+        } catch (_) {}
       }
       if (mounted) {
         AppScreen.go(this.context);
@@ -442,7 +450,6 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
       mappedWidget.add(Slidable(
         key: ObjectKey(mappeds[i]),
         direction: Axis.horizontal,
-
         child: TextButton(
           style: _buttonStyle(topRadius: false, botRadius: false, topPad: 15, botPad: 10),
           onPressed: () {
@@ -499,7 +506,11 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(Icons.delete, color: application.theme.fontLightColor, size: 24,),
+                  Icon(
+                    Icons.delete,
+                    color: application.theme.fontLightColor,
+                    size: 24,
+                  ),
                   Label(
                     Settings.locale((s) => s.delete, ctx: context),
                     color: application.theme.fontLightColor,
@@ -731,7 +742,11 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(Icons.delete, color: application.theme.fontLightColor, size: 24,),
+                  Icon(
+                    Icons.delete,
+                    color: application.theme.fontLightColor,
+                    size: 24,
+                  ),
                   Label(
                     Settings.locale((s) => s.delete, ctx: context),
                     color: application.theme.fontLightColor,

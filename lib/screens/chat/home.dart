@@ -19,6 +19,8 @@ import 'package:nmobile/components/layout/header.dart';
 import 'package:nmobile/components/layout/layout.dart';
 import 'package:nmobile/components/text/label.dart';
 import 'package:nmobile/routes/routes.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nmobile/providers/connected_provider.dart';
 import 'package:nmobile/schema/contact.dart';
 import 'package:nmobile/schema/wallet.dart';
 import 'package:nmobile/screens/chat/messages.dart';
@@ -55,7 +57,7 @@ class _ChatHomeScreenState extends BaseStateFulWidgetState<ChatHomeScreen> with 
   int clientConnectStatus = ClientConnectStatus.connecting;
 
   bool isLoginProgress = false;
-  bool connected = false;
+  // connected state managed by Riverpod connectedProvider
 
   @override
   void onRefreshArguments() {}
@@ -165,12 +167,10 @@ class _ChatHomeScreenState extends BaseStateFulWidgetState<ChatHomeScreen> with 
   }
 
   _setConnected(bool show) {
-    if (connected != show) {
-      connected = show; // no check mounted
-      setState(() {
-        connected = show;
-      });
-    }
+    try {
+      final container = ProviderScope.containerOf(context, listen: false);
+      container.read(connectedProvider.notifier).setConnected(show);
+    } catch (_) {}
   }
 
   _refreshContactMe({bool deviceInfo = false}) async {
@@ -195,80 +195,83 @@ class _ChatHomeScreenState extends BaseStateFulWidgetState<ChatHomeScreen> with 
 
     return BlocBuilder<WalletBloc, WalletState>(
       builder: (context, state) {
-        // wallet loaded no
-        if (!(state is WalletLoaded)) {
-          return Container(
-            child: SpinKitThreeBounce(
-              color: application.theme.primaryColor,
-              size: Settings.screenWidth() / 15,
-            ),
-          );
-        }
-        // wallet loaded yes
-        if (state.isWalletsEmpty()) {
-          return ChatNoWalletLayout();
-        } else if (!dbOpen && (dbUpdateTip?.isNotEmpty == true)) {
-          return _dbUpgradeTip();
-        } else if (!connected || (state.defaultWallet() == null)) {
-          return ChatNoConnectLayout((w) async {
-            bool succeed = await _tryLogin(wallet: w);
-            if (succeed) {
-              _refreshContactMe(deviceInfo: true);
-            }
-          });
-        }
-        // client connected
-        return Layout(
-          headerColor: application.theme.primaryColor,
-          bodyColor: application.theme.backgroundLightColor,
-          header: Header(
-            titleChild: Container(
-              margin: EdgeInsets.only(left: 20),
-              child: _contactMe != null
-                  ? ContactHeader(
-                      contact: _contactMe!,
-                      onTap: () {
-                        ContactProfileScreen.go(context, address: _contactMe?.address);
-                      },
-                      body: _headerBody(),
-                    )
-                  : SizedBox.shrink(),
-            ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: IconButton(
-                  icon: Asset.iconSvg('addbook', color: Colors.white, width: 24),
-                  onPressed: () {
-                    ContactHomeScreen.go(context);
-                  },
-                ),
-              )
-            ],
-          ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          floatingActionButton: Padding(
-            padding: EdgeInsets.only(bottom: 60, right: 4),
-            child: FloatingActionButton(
-              key: _floatingActionKey,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
-              elevation: 12,
-              backgroundColor: application.theme.primaryColor,
-              child: Asset.iconSvg('pencil', width: 24),
-              onPressed: () {
-                _showFloatActionMenu();
-              },
-            ),
-          ),
-          body: (_contactMe != null) && dbOpen
-              ? ChatSessionListLayout(_contactMe!)
-              : Container(
-                  child: SpinKitThreeBounce(
-                    color: application.theme.primaryColor,
-                    size: Settings.screenWidth() / 15,
+        return Consumer(builder: (context, ref, _) {
+          // wallet loaded no
+          if (!(state is WalletLoaded)) {
+            return Container(
+              child: SpinKitThreeBounce(
+                color: application.theme.primaryColor,
+                size: Settings.screenWidth() / 15,
+              ),
+            );
+          }
+          // wallet loaded yes
+          final connectedByProvider = ref.watch(connectedProvider);
+          if (state.isWalletsEmpty()) {
+            return ChatNoWalletLayout();
+          } else if (!dbOpen && (dbUpdateTip?.isNotEmpty == true)) {
+            return _dbUpgradeTip();
+          } else if (!connectedByProvider || (state.defaultWallet() == null)) {
+            return ChatNoConnectLayout((w) async {
+              bool succeed = await _tryLogin(wallet: w);
+              if (succeed) {
+                _refreshContactMe(deviceInfo: true);
+              }
+            });
+          }
+          // client connected
+          return Layout(
+            headerColor: application.theme.primaryColor,
+            bodyColor: application.theme.backgroundLightColor,
+            header: Header(
+              titleChild: Container(
+                margin: EdgeInsets.only(left: 20),
+                child: _contactMe != null
+                    ? ContactHeader(
+                        contact: _contactMe!,
+                        onTap: () {
+                          ContactProfileScreen.go(context, address: _contactMe?.address);
+                        },
+                        body: _headerBody(),
+                      )
+                    : SizedBox.shrink(),
+              ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: IconButton(
+                    icon: Asset.iconSvg('addbook', color: Colors.white, width: 24),
+                    onPressed: () {
+                      ContactHomeScreen.go(context);
+                    },
                   ),
-                ),
-        );
+                )
+              ],
+            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+            floatingActionButton: Padding(
+              padding: EdgeInsets.only(bottom: 60, right: 4),
+              child: FloatingActionButton(
+                key: _floatingActionKey,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                elevation: 12,
+                backgroundColor: application.theme.primaryColor,
+                child: Asset.iconSvg('pencil', width: 24),
+                onPressed: () {
+                  _showFloatActionMenu();
+                },
+              ),
+            ),
+            body: (_contactMe != null) && dbOpen
+                ? ChatSessionListLayout(_contactMe!)
+                : Container(
+                    child: SpinKitThreeBounce(
+                      color: application.theme.primaryColor,
+                      size: Settings.screenWidth() / 15,
+                    ),
+                  ),
+          );
+        });
       },
     );
   }

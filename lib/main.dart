@@ -24,6 +24,7 @@ import 'package:nmobile/storages/settings.dart' as settings_storage;
 import 'package:nmobile/storages/wallet.dart';
 import 'package:nmobile/utils/logger.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -108,11 +109,11 @@ void main() async {
         options.enableUserInteractionBreadcrumbs = true;
         // options.beforeSend = (SentryEvent event, {Hint? hint}) {};
       },
-      appRunner: () => runApp(Main()),
+      appRunner: () => runApp(ProviderScope(child: Main())),
     );
   } else {
     catchGlobalError(() async {
-      runApp(Main());
+      runApp(ProviderScope(child: Main()));
     }, onZoneError: (Object error, StackTrace stack) {
       if (Settings.debug) logger.e(error);
       if (Settings.sentryEnable) Sentry.captureException(error, stackTrace: stack);
