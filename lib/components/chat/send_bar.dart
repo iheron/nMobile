@@ -389,18 +389,18 @@ class _ChatSendBarState extends BaseStateFulWidgetState<ChatSendBar> {
                                     hintText: Settings.locale((s) => s.type_a_message, ctx: context),
                                     hintStyle: TextStyle(color: _theme.fontColor2),
                                     contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                                    prefixIcon: GestureDetector(
+                                    suffixIcon: GestureDetector(
                                       onTap: widget.onEmojiPressed,
                                       behavior: HitTestBehavior.opaque,
                                       child: Padding(
-                                        padding: EdgeInsets.only(left: 8, top: 4),
+                                        padding: EdgeInsets.only(right: 8, top: 4),
                                         child: FaIcon(
                                           FontAwesomeIcons.faceSmile,
                                           color: application.theme.primaryColor,
                                         ),
                                       ),
                                     ),
-                                    prefixIconConstraints: BoxConstraints(minHeight: 32, minWidth: 32),
+                                    suffixIconConstraints: BoxConstraints(minHeight: 32, minWidth: 32),
                                     border: UnderlineInputBorder(
                                       borderRadius: BorderRadius.all(Radius.circular(20)),
                                       borderSide: const BorderSide(width: 0, style: BorderStyle.none),
