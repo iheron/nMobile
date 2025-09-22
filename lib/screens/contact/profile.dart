@@ -1039,17 +1039,17 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
             onPressed: () {},
             child: Row(
               children: <Widget>[
-                Icon(FontAwesomeIcons.userSlash, size: 24, color: application.theme.fallColor),
+                Icon(FontAwesomeIcons.userSlash, size: 24, color: application.theme.primaryColor),
                 SizedBox(width: 10),
                 Label(
                   Settings.locale((s) => s.block, ctx: context),
                   type: LabelType.bodyRegular,
-                  color: application.theme.fallColor,
+                  color: application.theme.fontColor1,
                 ),
                 Spacer(),
                 CupertinoSwitch(
                   value: _blocked,
-                  activeTrackColor: application.theme.fallColor,
+                  activeTrackColor: application.theme.primaryColor,
                   onChanged: (value) async {
                     setState(() {
                       _blocked = value;
@@ -1065,7 +1065,7 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
             child: Label(
               Settings.locale((s) => s.block_tips, ctx: context),
               type: LabelType.bodySmall,
-              color: application.theme.fallColor,
+              color: application.theme.fontColor2,
               fontWeight: FontWeight.w600,
               softWrap: true,
             ),

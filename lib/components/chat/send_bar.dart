@@ -394,9 +394,10 @@ class _ChatSendBarState extends BaseStateFulWidgetState<ChatSendBar> {
                                       behavior: HitTestBehavior.opaque,
                                       child: Padding(
                                         padding: EdgeInsets.only(right: 8, top: 4),
-                                        child: FaIcon(
-                                          FontAwesomeIcons.faceSmile,
+                                        child: Asset.iconSvg(
+                                          'smile',
                                           color: application.theme.primaryColor,
+                                          width: 24,
                                         ),
                                       ),
                                     ),
