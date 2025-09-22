@@ -39,7 +39,7 @@ subprojects {
                 }
                 
                 val javaVersion = JavaVersion.VERSION_21
-                val androidApiVersion = 35
+                val androidApiVersion = 36
                 
                 android.compileSdkVersion(androidApiVersion)
                 android.defaultConfig.targetSdk = androidApiVersion
