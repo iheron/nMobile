@@ -35,9 +35,12 @@ target 'Runner' do
   pod 'Firebase/Analytics'
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 
-  target 'Share Extension' do
-      inherit! :search_paths
+  # share_handler addition start
+  target 'ShareExtension' do
+    inherit! :search_paths
+    pod "share_handler_ios_models", :path => ".symlinks/plugins/share_handler_ios/ios/Models"
   end
+  # share_handler addition end
 end
 
 post_install do |installer|
