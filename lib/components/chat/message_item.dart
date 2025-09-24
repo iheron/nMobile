@@ -366,7 +366,8 @@ class _ChatMessageItemState extends BaseStateFulWidgetState<ChatMessageItem> {
                   type: LabelType.bodyRegular,
                 ),
                 onTap: () {
-                  ContactProfileScreen.go(context, schema: this._sender);
+                  final String peerAddress = widget.message.isOutbound ? widget.message.targetId : widget.message.sender;
+                  ContactProfileScreen.go(context, address: peerAddress);
                 },
               ),
             ],
