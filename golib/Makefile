@@ -5,7 +5,7 @@ GOMOBILE=gomobile
 GOBIND=$(GOMOBILE) bind
 BUILDDIR=$(shell pwd)/build
 IMPORT_PATH=nkn
-LDFLAGS='-s -w'
+LDFLAGS="-s -w -extldflags=-Wl,-z,max-page-size=16384 -checklinkname=0"
 ANDROID_LDFLAGS='-s -w'
 
 ANDROID_BUILDDIR=$(BUILDDIR)/android
