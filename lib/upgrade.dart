@@ -9,14 +9,12 @@ class Upgrade {
   static const String _keyLastBuild = 'last_build';
 
   /// Call once after Settings.init().
-  /// Example: add steps like `if (needRunStep(342)) { /* do upgrade for 342 */ } else if (...) { ... }`.
   static Future<void> run() async {
     final int prev = await _getPreviousBuild();
     final int curr = _parseBuild(Settings.build);
     try {
-      // STEP: build 342
-      if (needRunStep(prevBuild: prev, currBuild: curr, targetBuild: 342)) {
-        logger.i("Upgrade - Running build 342 upgrade step");
+      if (needRunStep(prevBuild: prev, currBuild: curr, targetBuild: 343)) {
+        logger.i("Upgrade - Running build 343 upgrade step");
         logger.i("Upgrade - Previous build: $prev, Current build: $curr");
         final WalletStorage walletStorage = WalletStorage();
         final List<WalletSchema> wallets = await walletStorage.getAll();
