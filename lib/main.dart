@@ -26,6 +26,8 @@ import 'package:nmobile/storages/wallet.dart';
 import 'package:nmobile/utils/logger.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
+import 'upgrade.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -54,26 +56,31 @@ void main() async {
   application.registerInitialize(() async {
     Routes.init();
     await Settings.init();
+    await Upgrade.run();
   });
   await application.initialize();
-
   // Auto create default wallet on first launch
   try {
     final createdFlag = await settings_storage.SettingsStorage.getSettings(settings_storage.SettingsStorage.DEFAULT_WALLET_CREATED);
     if (!(createdFlag == true || createdFlag?.toString() == 'true')) {
-      // create NKN wallet with empty password
-      final Wallet nkn = await Wallet.create(null, config: WalletConfig(password: ''));
-      if (nkn.address.isNotEmpty && nkn.keystore.isNotEmpty) {
-        final WalletStorage walletStorage = WalletStorage();
-        final WalletSchema wallet = WalletSchema(
-          type: WalletType.nkn,
-          address: nkn.address,
-          publicKey: hexEncode(nkn.publicKey),
-          name: 'Default Account',
-        );
-        await walletStorage.add(wallet, nkn.keystore, '', hexEncode(nkn.seed));
-        await walletStorage.setDefaultAddress(wallet.address);
+      final WalletStorage walletStorage = WalletStorage();
+      final List<WalletSchema> existingWallets = await walletStorage.getAll();
+      if (existingWallets.isNotEmpty) {
         await settings_storage.SettingsStorage.setSettings(settings_storage.SettingsStorage.DEFAULT_WALLET_CREATED, true);
+      } else {
+        // create NKN wallet with empty password
+        final Wallet nkn = await Wallet.create(null, config: WalletConfig(password: ''));
+        if (nkn.address.isNotEmpty && nkn.keystore.isNotEmpty) {
+          final WalletSchema wallet = WalletSchema(
+            type: WalletType.nkn,
+            address: nkn.address,
+            publicKey: hexEncode(nkn.publicKey),
+            name: 'Default Account',
+          );
+          await walletStorage.add(wallet, nkn.keystore, '', hexEncode(nkn.seed));
+          await walletStorage.setDefaultAddress(wallet.address);
+          await settings_storage.SettingsStorage.setSettings(settings_storage.SettingsStorage.DEFAULT_WALLET_CREATED, true);
+        }
       }
     }
   } catch (e, st) {
