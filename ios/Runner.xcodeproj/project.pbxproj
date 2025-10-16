@@ -3,11 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		147F890F2E83CBC000BFD48B /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 147F89052E83CBC000BFD48B /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		147F899F2EA0F29300BFD48B /* Config.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147F899E2EA0F29300BFD48B /* Config.generated.swift */; };
 		148FFB1A2E60499C005410D0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 148FFB192E60499C005410D0 /* GoogleService-Info.plist */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		149BC80728FEAEB000D27A6D /* DnsResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149BC80628FEAEB000D27A6D /* DnsResolver.swift */; };
@@ -82,6 +83,7 @@
 		0C98E54980A890E1BD057FA6 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		142209AC2E7AB14500C679DC /* receive_sharing_intent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = receive_sharing_intent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		147F89052E83CBC000BFD48B /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		147F899E2EA0F29300BFD48B /* Config.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.generated.swift; sourceTree = "<group>"; };
 		148FFB192E60499C005410D0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
@@ -264,6 +266,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				147F899E2EA0F29300BFD48B /* Config.generated.swift */,
 				148FFB192E60499C005410D0 /* GoogleService-Info.plist */,
 				C6CABF45268452450054F007 /* Runner.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
@@ -382,6 +385,7 @@
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				E1B3F2B6291BA8040042F7B2 /* Embed App Extensions */,
 				9740EEB61CF901F6004384FC /* Run Script */,
+				147F899D2EA0F0C900BFD48B /* ShellScript */,
 				97C146EA1CF9000F007C117D /* Sources */,
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
@@ -463,6 +467,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		147F899D2EA0F0C900BFD48B /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\n\nOUT_FILE=\"$SRCROOT/Runner/Config.generated.swift\"\n\n# 这些值来自 .xcconfig（或 Scheme/CI 环境变量）\n: \"${P12_FILE_NAME:=}\"\n: \"${P12_FILE_PASSWORD:=}\"\n\ncat > \"$OUT_FILE\" <<EOF\n// Auto-generated. Do not edit.\nenum BuildSecrets {\n    static let apnsP12FileName: String = \"${P12_FILE_NAME}\"\n    static let apnsP12Password: String = \"${P12_FILE_PASSWORD}\"\n}\nEOF\n\necho \"✅ Wrote $OUT_FILE\"\n";
+		};
 		3B06AD1E1E4923F5004D2608 /* Thin Binary */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -509,13 +530,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -545,13 +562,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -598,6 +611,7 @@
 				C6FFD764266E09E600410547 /* CommonOc.m in Sources */,
 				C62BB8192689AA0E00DAAC43 /* NWSSLConnection.m in Sources */,
 				C6824D2E272E4EA900BA7AAF /* APNsPort.swift in Sources */,
+				147F899F2EA0F29300BFD48B /* Config.generated.swift in Sources */,
 				C62BB8182689AA0E00DAAC43 /* NWType.m in Sources */,
 				C6824D2B272E4EA900BA7AAF /* PKCS12Adapter.swift in Sources */,
 				E1852ED82878179100FC45FD /* Crypto.swift in Sources */,

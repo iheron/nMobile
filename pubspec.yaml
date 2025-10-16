@@ -130,6 +130,9 @@ dependencies:
   nkn_sdk_flutter:
     path: ./plugins/nkn-sdk-flutter
 
+  # tools
+  flutter_dotenv: ^6.0.0
+
 dependency_overrides:
   sqflite:
     path: ./plugins/sqflite_sqlcipher-fmdb_override/sqflite
@@ -150,6 +153,7 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
+    - .env
     - assets/
     - assets/contact/
     - assets/icons/
