@@ -32,6 +32,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m5(other) => "${other}已接受邀请";
 
+  static String m6(length) => "请至少输入 ${length} 个字符。";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "Accelerate": MessageLookupByLibrary.simpleMessage("加速"),
@@ -153,6 +155,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "create_nkn_wallet": MessageLookupByLibrary.simpleMessage("创建主网账户"),
         "create_private_group": MessageLookupByLibrary.simpleMessage("新建私有群"),
         "create_wallet": MessageLookupByLibrary.simpleMessage("创建账户"),
+        "custom_id": MessageLookupByLibrary.simpleMessage("自定义ID"),
+        "custom_id_tips": MessageLookupByLibrary.simpleMessage(
+            "您可以设置自定义ID，以便于其他人通过此ID添加您为好友。"),
         "d_chat": MessageLookupByLibrary.simpleMessage("滴聊"),
         "d_chat_address": MessageLookupByLibrary.simpleMessage("滴聊地址"),
         "d_chat_not_login": MessageLookupByLibrary.simpleMessage("D-Chat 未登录"),
@@ -196,6 +201,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "done": MessageLookupByLibrary.simpleMessage("完成"),
         "edit": MessageLookupByLibrary.simpleMessage("编辑"),
         "edit_contact": MessageLookupByLibrary.simpleMessage("编辑"),
+        "edit_custom_id": MessageLookupByLibrary.simpleMessage("编辑自定义ID"),
         "edit_name": MessageLookupByLibrary.simpleMessage("编辑"),
         "edit_nickname": MessageLookupByLibrary.simpleMessage("编辑昵称"),
         "edit_notes": MessageLookupByLibrary.simpleMessage("编辑备注"),
@@ -247,6 +253,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "gas_price": MessageLookupByLibrary.simpleMessage("Gas Price"),
         "general": MessageLookupByLibrary.simpleMessage("通用"),
         "go_backup": MessageLookupByLibrary.simpleMessage("去备份"),
+        "go_to_set": MessageLookupByLibrary.simpleMessage("去设置"),
         "group_chat": MessageLookupByLibrary.simpleMessage("群"),
         "group_member_already":
             MessageLookupByLibrary.simpleMessage("该成员已经加入本群"),
@@ -272,6 +279,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "从已有的账户中，找出如何导出Seed（也称为“秘密种子”），对其进行备份，然后使用它导入nMobile。"),
         "import_with_seed_title":
             MessageLookupByLibrary.simpleMessage("使用Seed导入"),
+        "input_custom_id": MessageLookupByLibrary.simpleMessage("请输入自定义ID"),
         "input_d_chat_address": MessageLookupByLibrary.simpleMessage("请输入滴聊地址"),
         "input_keystore": MessageLookupByLibrary.simpleMessage("请粘贴 keystore"),
         "input_name": MessageLookupByLibrary.simpleMessage("请输入名字"),
@@ -462,6 +470,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "start_chat": MessageLookupByLibrary.simpleMessage("开始聊天"),
         "storage_text": MessageLookupByLibrary.simpleMessage("存储"),
         "stranger": MessageLookupByLibrary.simpleMessage("陌生人"),
+        "submitting": MessageLookupByLibrary.simpleMessage("提交中..."),
         "subscribe": MessageLookupByLibrary.simpleMessage("加入"),
         "subscribe_or_waiting":
             MessageLookupByLibrary.simpleMessage("加入或等待片刻..."),
@@ -474,9 +483,17 @@ class MessageLookup extends MessageLookupByLibrary {
         "tip": MessageLookupByLibrary.simpleMessage("提示"),
         "tip_ask_group_owner_permission":
             MessageLookupByLibrary.simpleMessage("您已不在此群，联系群主邀请您"),
+        "tip_custom_id_already_set":
+            MessageLookupByLibrary.simpleMessage("此自定义ID已经是您当前的ID，无需重复设置"),
+        "tip_custom_id_format":
+            MessageLookupByLibrary.simpleMessage("自定义ID只能包含字母、数字或下划线"),
+        "tip_custom_id_taken":
+            MessageLookupByLibrary.simpleMessage("此自定义ID已被其他用户占用"),
+        "tip_input_min_length": m6,
         "tip_open_send_device_token":
             MessageLookupByLibrary.simpleMessage("是否开启来自对方的消息通知提醒?"),
         "tip_password_error": MessageLookupByLibrary.simpleMessage("密码错误"),
+        "tip_submit_failed": MessageLookupByLibrary.simpleMessage("提交失败"),
         "tip_switch_success": MessageLookupByLibrary.simpleMessage("切换成功!"),
         "tips": MessageLookupByLibrary.simpleMessage("提示"),
         "title": MessageLookupByLibrary.simpleMessage("nMobile"),
@@ -523,6 +540,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "video": MessageLookupByLibrary.simpleMessage("视频"),
         "view_all": MessageLookupByLibrary.simpleMessage("查看全部"),
         "view_channel_members": MessageLookupByLibrary.simpleMessage("查看群成员"),
+        "view_more_info": MessageLookupByLibrary.simpleMessage("查看更多信息"),
         "view_profile": MessageLookupByLibrary.simpleMessage("查看资料"),
         "view_qrcode": MessageLookupByLibrary.simpleMessage("查看二维码"),
         "waiting_for_data_to_sync":

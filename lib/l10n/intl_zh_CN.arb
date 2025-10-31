@@ -250,6 +250,7 @@
   "input_name": "请输入名字",
   "input_wallet_address": "请输入账户地址",
   "input_notes": "备注",
+  "input_custom_id": "请输入自定义ID",
   "invitee_already_exists": "收邀人已存在",
   "edit_notes": "编辑备注",
   "view_all": "查看全部",
@@ -427,5 +428,16 @@
   "block": "屏蔽",
   "block_tips": "启用后，将屏蔽对方的消息。",
   "revoke": "撤回",
-  "confirm_revoke": "确定要撤回此消息吗？"
+  "confirm_revoke": "确定要撤回此消息吗？",
+  "edit_custom_id": "编辑自定义ID",
+  "custom_id": "自定义ID",
+  "custom_id_tips": "您可以设置自定义ID，以便于其他人通过此ID添加您为好友。",
+  "tip_input_min_length": "请至少输入 {length} 个字符。",
+  "go_to_set": "去设置",
+  "submitting": "提交中...",
+  "tip_submit_failed": "提交失败",
+  "tip_custom_id_taken": "此自定义ID已被其他用户占用",
+  "tip_custom_id_already_set": "此自定义ID已经是您当前的ID，无需重复设置",
+  "view_more_info": "查看更多信息",
+  "tip_custom_id_format": "自定义ID只能包含字母、数字或下划线"
 }

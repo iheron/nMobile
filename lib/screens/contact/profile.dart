@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:nkn_sdk_flutter/utils/hex.dart';
+import 'package:nkn_sdk_flutter/wallet.dart';
 import 'package:nmobile/app.dart';
 import 'package:nmobile/common/locator.dart';
 import 'package:nmobile/common/settings.dart';
@@ -35,6 +38,7 @@ import 'package:nmobile/utils/path.dart';
 import 'package:nmobile/utils/util.dart';
 
 import '../../providers/connected_provider.dart';
+import '../../providers/custom_id_provider.dart';
 
 class ContactProfileScreen extends BaseStateFulWidget {
   static const String routeName = '/contact/profile';
@@ -138,10 +142,53 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
       setState(() {
         _contact = event;
       });
+      // Reload custom ID when contact is updated
+      _loadCustomId();
     });
 
     // init
     _refreshDefaultWallet();
+  }
+
+  /// Load custom ID from server
+  void _loadCustomId() async {
+    // Only load if it's the current user's profile
+    if (_contact?.isMe == true) {
+      // Delay to ensure context is available
+      await Future.delayed(Duration.zero);
+      if (!mounted) return;
+
+      // Extract public key from contact address (handles "identifier.publickey" format)
+      String? contactAddress = _contact?.address;
+      if (contactAddress == null || contactAddress.isEmpty) return;
+
+      // Split by '.' and take the last part (public key)
+      String publicKey = contactAddress.split('.').last;
+
+      // Convert public key to wallet address
+      String? walletAddress = await Wallet.pubKeyToWalletAddr(publicKey);
+      if (walletAddress == null || walletAddress.isEmpty) return;
+
+      // Get seed from secure storage
+      String? seedHex = await walletCommon.getSeed(walletAddress);
+      if (seedHex == null || seedHex.isEmpty) return;
+
+      // Convert seed hex to Uint8List
+      Uint8List seed;
+      try {
+        seed = hexDecode(seedHex);
+      } catch (e) {
+        logger.w("$TAG - _loadCustomId - invalid seed format: $e");
+        return;
+      }
+
+      // Get NKN client address - use clientCommon.address if available, otherwise use publicKey
+      // This allows loading even when NKN client is not connected yet
+      String nknAddress = clientCommon.address ?? publicKey;
+
+      final container = ProviderScope.containerOf(context, listen: false);
+      await container.read(customIdProvider.notifier).loadCustomId(seed, nknAddress);
+    }
   }
 
   @override
@@ -188,6 +235,9 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
         if (value) contactCommon.setDeviceInfoRequestAt(_contact?.address);
       }); // await
     }
+
+    // Load custom ID after contact is initialized
+    _loadCustomId();
   }
 
   _initBurning(ContactSchema? schema) {
@@ -321,8 +371,9 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
       value: _contact?.displayName,
       actionText: Settings.locale((s) => s.save, ctx: context),
       maxLength: 20,
-      canTapClose: false,
+      canTapClose: true,
     );
+    if (newName == null) return;
     if (_contact?.type == ContactType.me) {
       contactCommon.setSelfFullName(_contact?.address, newName?.trim(), null, notify: true); // await
     } else {
@@ -409,6 +460,17 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
       return address;
     }
     return '';
+  }
+
+  /// Get display text - show custom ID if available, otherwise show address
+  String _getDisplayText(CustomIdState customIdState) {
+    // If it's the current user and has custom ID, show custom ID
+    // Use _contact?.isMe instead of comparing addresses to work when client is still connecting
+    if (_contact?.isMe == true && customIdState.customId != null && customIdState.customId!.isNotEmpty) {
+      return customIdState.customId!;
+    }
+    // Otherwise show address
+    return _getClientAddressShow();
   }
 
   @override
@@ -564,6 +626,73 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
                     ),
                     SizedBox(height: 24),
 
+                    /// address or custom ID
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final customIdState = ref.watch(customIdProvider);
+                        final displayText = _getDisplayText(customIdState);
+                        // Use _contact?.isMe instead of comparing addresses to work when client is still connecting
+                        final hasCustomId = _contact?.isMe == true && customIdState.customId != null && customIdState.customId!.isNotEmpty;
+
+                        return TextButton(
+                          style: _buttonStyle(topRadius: true, botRadius: true, topPad: 12, botPad: 12),
+                          onPressed: () {
+                            if (this._contact == null) return;
+                            ContactChatProfileScreen.go(this.context, this._contact!);
+                          },
+                          child: Row(
+                            children: <Widget>[
+                              // Show fingerprint icon for custom ID, chat-id icon for D-Chat address
+                              hasCustomId
+                                  ? FaIcon(
+                                      FontAwesomeIcons.fingerprint,
+                                      size: 24,
+                                      color: application.theme.primaryColor,
+                                    )
+                                  : Asset.image('chat/chat-id.png', color: application.theme.primaryColor, width: 24),
+                              SizedBox(width: 10),
+                              Label(
+                                hasCustomId ? Settings.locale((s) => s.custom_id, ctx: context) : Settings.locale((s) => s.d_chat_address, ctx: context),
+                                type: LabelType.bodyRegular,
+                                color: application.theme.fontColor1,
+                              ),
+                              Spacer(),
+                              // Only show loading when there's no cached customId
+                              (customIdState.isLoading && customIdState.customId == null)
+                                  ? SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  : Label(
+                                      displayText,
+                                      type: LabelType.bodyRegular,
+                                      color: application.theme.fontColor2,
+                                      overflow: TextOverflow.fade,
+                                      textAlign: TextAlign.right,
+                                    ),
+                              Asset.iconSvg(
+                                'right',
+                                width: 24,
+                                color: application.theme.fontColor2,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6, left: 20, right: 20),
+                      child: Label(
+                        Settings.locale((s) => s.custom_id_tips, ctx: context),
+                        type: LabelType.bodySmall,
+                        color: application.theme.fontColor2,
+                        fontWeight: FontWeight.w600,
+                        softWrap: true,
+                      ),
+                    ),
+                    SizedBox(height: 24),
+
                     /// name
                     TextButton(
                       style: _buttonStyle(topRadius: true, botRadius: false, topPad: 15, botPad: 10),
@@ -599,39 +728,39 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
                     ),
 
                     /// address
-                    TextButton(
-                      style: _buttonStyle(topRadius: false, botRadius: false, topPad: 12, botPad: 12),
-                      onPressed: () {
-                        if (this._contact == null) return;
-                        ContactChatProfileScreen.go(this.context, this._contact!);
-                      },
-                      child: Row(
-                        children: <Widget>[
-                          Asset.image('chat/chat-id.png', color: application.theme.primaryColor, width: 24),
-                          SizedBox(width: 10),
-                          Label(
-                            Settings.locale((s) => s.d_chat_address, ctx: context),
-                            type: LabelType.bodyRegular,
-                            color: application.theme.fontColor1,
-                          ),
-                          SizedBox(width: 20),
-                          Expanded(
-                            child: Label(
-                              _getClientAddressShow(),
-                              type: LabelType.bodyRegular,
-                              color: application.theme.fontColor2,
-                              overflow: TextOverflow.fade,
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
-                          Asset.iconSvg(
-                            'right',
-                            width: 24,
-                            color: application.theme.fontColor2,
-                          ),
-                        ],
-                      ),
-                    ),
+                    // TextButton(
+                    //   style: _buttonStyle(topRadius: false, botRadius: false, topPad: 12, botPad: 12),
+                    //   onPressed: () {
+                    //     if (this._contact == null) return;
+                    //     ContactChatProfileScreen.go(this.context, this._contact!);
+                    //   },
+                    //   child: Row(
+                    //     children: <Widget>[
+                    //       Asset.image('chat/chat-id.png', color: application.theme.primaryColor, width: 24),
+                    //       SizedBox(width: 10),
+                    //       Label(
+                    //         Settings.locale((s) => s.d_chat_address, ctx: context),
+                    //         type: LabelType.bodyRegular,
+                    //         color: application.theme.fontColor1,
+                    //       ),
+                    //       Spacer(),
+                    //       Expanded(
+                    //         child: Label(
+                    //           _getClientAddressShow(),
+                    //           type: LabelType.bodyRegular,
+                    //           color: application.theme.fontColor2,
+                    //           overflow: TextOverflow.fade,
+                    //           textAlign: TextAlign.right,
+                    //         ),
+                    //       ),
+                    //       Asset.iconSvg(
+                    //         'right',
+                    //         width: 24,
+                    //         color: application.theme.fontColor2,
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
 
                     /// wallet
                     TextButton(

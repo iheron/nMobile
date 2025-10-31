@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		147F890F2E83CBC000BFD48B /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 147F89052E83CBC000BFD48B /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		147F899F2EA0F29300BFD48B /* Config.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147F899E2EA0F29300BFD48B /* Config.generated.swift */; };
+		147F89C22EAB685B00BFD48B /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147F89C12EAB684F00BFD48B /* Search.swift */; };
 		148FFB1A2E60499C005410D0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 148FFB192E60499C005410D0 /* GoogleService-Info.plist */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		149BC80728FEAEB000D27A6D /* DnsResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149BC80628FEAEB000D27A6D /* DnsResolver.swift */; };
@@ -84,6 +85,9 @@
 		142209AC2E7AB14500C679DC /* receive_sharing_intent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = receive_sharing_intent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		147F89052E83CBC000BFD48B /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		147F899E2EA0F29300BFD48B /* Config.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.generated.swift; sourceTree = "<group>"; };
+		147F89C12EAB684F00BFD48B /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
+		147F8A132EAF5B4000BFD48B /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
+		147F8A252EAF5BE400BFD48B /* libresolv.9.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.9.tbd; path = usr/lib/libresolv.9.tbd; sourceTree = SDKROOT; };
 		148FFB192E60499C005410D0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
@@ -186,9 +190,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		147F89C02EAB684700BFD48B /* SearchService */ = {
+			isa = PBXGroup;
+			children = (
+				147F89C12EAB684F00BFD48B /* Search.swift */,
+			);
+			path = SearchService;
+			sourceTree = "<group>";
+		};
 		149BC80528FD5E9300D27A6D /* impl */ = {
 			isa = PBXGroup;
 			children = (
+				147F89C02EAB684700BFD48B /* SearchService */,
 				14A871CC287D6D980093692A /* NameService */,
 			);
 			path = impl;
@@ -222,6 +235,8 @@
 		594E66BF7E7D2CAB5FC62094 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				147F8A252EAF5BE400BFD48B /* libresolv.9.tbd */,
+				147F8A132EAF5B4000BFD48B /* libresolv.tbd */,
 				142209AC2E7AB14500C679DC /* receive_sharing_intent.framework */,
 				334D81B7E27D6131B561C943 /* Pods_Runner.framework */,
 				9C257DECA1497057748992AF /* Pods_Share_Extension.framework */,
@@ -629,6 +644,7 @@
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				C62BB8162689AA0E00DAAC43 /* NWPushFeedback.m in Sources */,
 				C62BB81A2689AA0E00DAAC43 /* NWPusher.m in Sources */,
+				147F89C22EAB685B00BFD48B /* Search.swift in Sources */,
 				C6824D29272E4EA900BA7AAF /* Connection.swift in Sources */,
 				149BC80728FEAEB000D27A6D /* DnsResolver.swift in Sources */,
 			);

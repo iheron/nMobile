@@ -33,6 +33,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m5(other) => "${other} have already accepted";
 
+  static String m6(length) => "Please enter at least ${length} characters.";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "Accelerate": MessageLookupByLibrary.simpleMessage("Accelerate"),
@@ -182,6 +184,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "create_private_group":
             MessageLookupByLibrary.simpleMessage("Create Private Group"),
         "create_wallet": MessageLookupByLibrary.simpleMessage("Create Account"),
+        "custom_id": MessageLookupByLibrary.simpleMessage("Custom ID"),
+        "custom_id_tips": MessageLookupByLibrary.simpleMessage(
+            "You can set a custom ID so that others can add you as a friend using this ID."),
         "d_chat": MessageLookupByLibrary.simpleMessage("D-Chat"),
         "d_chat_address": MessageLookupByLibrary.simpleMessage("D-Chat ID"),
         "d_chat_not_login":
@@ -233,6 +238,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "done": MessageLookupByLibrary.simpleMessage("Done"),
         "edit": MessageLookupByLibrary.simpleMessage("Edit"),
         "edit_contact": MessageLookupByLibrary.simpleMessage("Edit Contact"),
+        "edit_custom_id":
+            MessageLookupByLibrary.simpleMessage("Edit Custom ID"),
         "edit_name": MessageLookupByLibrary.simpleMessage("Edit Name"),
         "edit_nickname": MessageLookupByLibrary.simpleMessage("Edit Nickname"),
         "edit_notes": MessageLookupByLibrary.simpleMessage("Edit Notes"),
@@ -294,6 +301,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "gas_price": MessageLookupByLibrary.simpleMessage("Gas Price"),
         "general": MessageLookupByLibrary.simpleMessage("General"),
         "go_backup": MessageLookupByLibrary.simpleMessage("Go Backup"),
+        "go_to_set": MessageLookupByLibrary.simpleMessage("Go to set"),
         "group_chat": MessageLookupByLibrary.simpleMessage("Group"),
         "group_member_already": MessageLookupByLibrary.simpleMessage(
             "The member is in group already"),
@@ -324,6 +332,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "From your existing wallet, find out how to export Seed (also called \"Secret Seed\"), make a backup copy, and then use it to import your existing wallet into nMobile."),
         "import_with_seed_title":
             MessageLookupByLibrary.simpleMessage("Import with Seed"),
+        "input_custom_id":
+            MessageLookupByLibrary.simpleMessage("Please input Custom ID"),
         "input_d_chat_address":
             MessageLookupByLibrary.simpleMessage("Please input D-Chat ID"),
         "input_keystore":
@@ -553,6 +563,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "start_chat": MessageLookupByLibrary.simpleMessage("Start Chat"),
         "storage_text": MessageLookupByLibrary.simpleMessage("Storage"),
         "stranger": MessageLookupByLibrary.simpleMessage("Stranger"),
+        "submitting": MessageLookupByLibrary.simpleMessage("Submitting..."),
         "subscribe": MessageLookupByLibrary.simpleMessage("Subscribe"),
         "subscribe_or_waiting":
             MessageLookupByLibrary.simpleMessage("Subscribe or Waiting..."),
@@ -565,10 +576,19 @@ class MessageLookup extends MessageLookupByLibrary {
         "tip": MessageLookupByLibrary.simpleMessage("Tips"),
         "tip_ask_group_owner_permission": MessageLookupByLibrary.simpleMessage(
             "You are not in this group,ask the group owner for permission"),
+        "tip_custom_id_already_set": MessageLookupByLibrary.simpleMessage(
+            "This custom ID is already set as your current ID"),
+        "tip_custom_id_format": MessageLookupByLibrary.simpleMessage(
+            "Custom ID can only contain letters, numbers, or underscores"),
+        "tip_custom_id_taken": MessageLookupByLibrary.simpleMessage(
+            "This custom ID is already taken by another user"),
+        "tip_input_min_length": m6,
         "tip_open_send_device_token": MessageLookupByLibrary.simpleMessage(
             "Whether to open the notification reminder from the other party?"),
         "tip_password_error":
             MessageLookupByLibrary.simpleMessage("Wrong password"),
+        "tip_submit_failed":
+            MessageLookupByLibrary.simpleMessage("Submit failed"),
         "tip_switch_success":
             MessageLookupByLibrary.simpleMessage("Switch Success!"),
         "tips": MessageLookupByLibrary.simpleMessage("Tips"),
@@ -620,6 +640,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "video": MessageLookupByLibrary.simpleMessage("Video"),
         "view_all": MessageLookupByLibrary.simpleMessage("View All"),
         "view_channel_members": MessageLookupByLibrary.simpleMessage("Members"),
+        "view_more_info":
+            MessageLookupByLibrary.simpleMessage("View More Info"),
         "view_profile": MessageLookupByLibrary.simpleMessage("View Profile"),
         "view_qrcode": MessageLookupByLibrary.simpleMessage("View QR Code"),
         "waiting_for_data_to_sync":

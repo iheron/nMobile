@@ -2360,6 +2360,16 @@ class S {
     );
   }
 
+  /// `Please input Custom ID`
+  String get input_custom_id {
+    return Intl.message(
+      'Please input Custom ID',
+      name: 'input_custom_id',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Invitee already exists`
   String get invitee_already_exists {
     return Intl.message(
@@ -4135,6 +4145,116 @@ class S {
     return Intl.message(
       'Are you sure you want to revoke this message?',
       name: 'confirm_revoke',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit Custom ID`
+  String get edit_custom_id {
+    return Intl.message(
+      'Edit Custom ID',
+      name: 'edit_custom_id',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Custom ID`
+  String get custom_id {
+    return Intl.message(
+      'Custom ID',
+      name: 'custom_id',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can set a custom ID so that others can add you as a friend using this ID.`
+  String get custom_id_tips {
+    return Intl.message(
+      'You can set a custom ID so that others can add you as a friend using this ID.',
+      name: 'custom_id_tips',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter at least {length} characters.`
+  String tip_input_min_length(Object length) {
+    return Intl.message(
+      'Please enter at least $length characters.',
+      name: 'tip_input_min_length',
+      desc: '',
+      args: [length],
+    );
+  }
+
+  /// `Go to set`
+  String get go_to_set {
+    return Intl.message(
+      'Go to set',
+      name: 'go_to_set',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Submitting...`
+  String get submitting {
+    return Intl.message(
+      'Submitting...',
+      name: 'submitting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Submit failed`
+  String get tip_submit_failed {
+    return Intl.message(
+      'Submit failed',
+      name: 'tip_submit_failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This custom ID is already taken by another user`
+  String get tip_custom_id_taken {
+    return Intl.message(
+      'This custom ID is already taken by another user',
+      name: 'tip_custom_id_taken',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This custom ID is already set as your current ID`
+  String get tip_custom_id_already_set {
+    return Intl.message(
+      'This custom ID is already set as your current ID',
+      name: 'tip_custom_id_already_set',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `View More Info`
+  String get view_more_info {
+    return Intl.message(
+      'View More Info',
+      name: 'view_more_info',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Custom ID can only contain letters, numbers, or underscores`
+  String get tip_custom_id_format {
+    return Intl.message(
+      'Custom ID can only contain letters, numbers, or underscores',
+      name: 'tip_custom_id_format',
       desc: '',
       args: [],
     );

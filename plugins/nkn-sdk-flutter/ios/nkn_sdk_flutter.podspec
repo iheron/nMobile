@@ -16,7 +16,7 @@ nkn-sdk-flutter
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
   s.platform = :ios, '11.0'
-
+  s.libraries = 'resolv'
   s.vendored_frameworks = 'Frameworks/*.xcframework'
 
   # Flutter.framework does not contain a i386 slice.

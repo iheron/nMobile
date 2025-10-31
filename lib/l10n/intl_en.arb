@@ -250,6 +250,7 @@
   "input_name": "Please input Name",
   "input_wallet_address": "Please input Account Address",
   "input_notes": "Please input Notes",
+  "input_custom_id": "Please input Custom ID",
   "invitee_already_exists": "Invitee already exists",
   "edit_notes": "Edit Notes",
   "view_all": "View All",
@@ -427,5 +428,16 @@
   "block": "Block",
   "block_tips": "After enabling, messages from this user will be blocked.",
   "revoke": "Revoke",
-  "confirm_revoke": "Are you sure you want to revoke this message?"
+  "confirm_revoke": "Are you sure you want to revoke this message?",
+  "edit_custom_id": "Edit Custom ID",
+  "custom_id": "Custom ID",
+  "custom_id_tips": "You can set a custom ID so that others can add you as a friend using this ID.",
+  "tip_input_min_length": "Please enter at least {length} characters.",
+  "go_to_set": "Go to set",
+  "submitting": "Submitting...",
+  "tip_submit_failed": "Submit failed",
+  "tip_custom_id_taken": "This custom ID is already taken by another user",
+  "tip_custom_id_already_set": "This custom ID is already set as your current ID",
+  "view_more_info": "View More Info",
+  "tip_custom_id_format": "Custom ID can only contain letters, numbers, or underscores"
 }

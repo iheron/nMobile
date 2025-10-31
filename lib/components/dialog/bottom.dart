@@ -290,15 +290,18 @@ class BottomDialog extends BaseStateFulWidget {
     String? actionText,
     bool password = false,
     double height = 300,
+    int minLength = 0,
     int maxLength = 10000,
     bool enable = true,
     bool contactSelect = false,
     bool canTapClose = true,
+    Future<String?> Function(String)? asyncValidator,
   }) async {
     TextEditingController _inputController = TextEditingController();
     _inputController.text = value ?? "";
+    ValueNotifier<String?> errorNotifier = ValueNotifier<String?>(null);
 
-    return showWithTitle<String>(
+    return showWithTitle<String?>(
       title: title,
       desc: desc,
       height: height,
@@ -308,7 +311,22 @@ class BottomDialog extends BaseStateFulWidget {
         child: Button(
           text: actionText ?? Settings.locale((s) => s.continue_text, ctx: context),
           width: double.infinity,
-          onPressed: () {
+          onPressed: () async {
+            // Validate minimum length
+            if (minLength > 0 && _inputController.text.length < minLength) {
+              errorNotifier.value = Settings.locale((s) => s.tip_input_min_length(minLength.toString()), ctx: context);
+              return;
+            }
+            
+            // Async validation
+            if (asyncValidator != null) {
+              final error = await asyncValidator(_inputController.text);
+              if (error != null) {
+                errorNotifier.value = error;
+                return;
+              }
+            }
+            
             if (Navigator.of(this.context).canPop()) Navigator.pop(this.context, _inputController.text);
           },
         ),
@@ -323,32 +341,44 @@ class BottomDialog extends BaseStateFulWidget {
               type: LabelType.h4,
               textAlign: TextAlign.start,
             ),
-            FormText(
-              controller: _inputController,
-              hintText: inputHint ?? "",
-              validator: validator,
-              password: password,
-              maxLength: maxLength,
-              enabled: enable,
-              suffixIcon: contactSelect
-                  ? GestureDetector(
-                      onTap: () async {
-                        if (clientCommon.isClientOK) {
-                          var contact = await ContactHomeScreen.go(context, selectContact: true);
-                          if ((contact != null) && (contact is ContactSchema)) {
-                            _inputController.text = contact.address;
-                          }
-                        } else {
-                          Toast.show(Settings.locale((s) => s.d_chat_not_login, ctx: context));
-                        }
-                      },
-                      child: Container(
-                        width: 20,
-                        alignment: Alignment.centerRight,
-                        child: Icon(FontAwesomeIcons.solidAddressBook),
-                      ),
-                    )
-                  : SizedBox.shrink(),
+            ValueListenableBuilder<String?>(
+              valueListenable: errorNotifier,
+              builder: (context, errorText, child) {
+                return FormText(
+                  controller: _inputController,
+                  hintText: inputHint ?? "",
+                  validator: validator,
+                  password: password,
+                  maxLength: maxLength,
+                  enabled: enable,
+                  errorText: errorText,
+                  onChanged: (value) {
+                    // Clear error when user types
+                    if (errorNotifier.value != null) {
+                      errorNotifier.value = null;
+                    }
+                  },
+                  suffixIcon: contactSelect
+                      ? GestureDetector(
+                          onTap: () async {
+                            if (clientCommon.isClientOK) {
+                              var contact = await ContactHomeScreen.go(context, selectContact: true);
+                              if ((contact != null) && (contact is ContactSchema)) {
+                                _inputController.text = contact.address;
+                              }
+                            } else {
+                              Toast.show(Settings.locale((s) => s.d_chat_not_login, ctx: context));
+                            }
+                          },
+                          child: Container(
+                            width: 20,
+                            alignment: Alignment.centerRight,
+                            child: Icon(FontAwesomeIcons.solidAddressBook),
+                          ),
+                        )
+                      : SizedBox.shrink(),
+                );
+              },
             ),
           ],
         ),

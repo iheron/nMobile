@@ -1,6 +1,8 @@
 package nkngolib
 
 import (
+	"nkngolib/search"
+
 	dnsresolver "github.com/nknorg/dns-resolver-go"
 	ethresolver "github.com/nknorg/eth-resolver-go"
 	"github.com/nknorg/nkn-sdk-go"
@@ -16,4 +18,5 @@ var (
 	_ = nkngomobile.NewStringArray
 	_ = reedsolomon.New
 	_ = bind.GenGo
+	_ = search.NewSearchClient
 )
