@@ -4160,6 +4160,16 @@ class S {
     );
   }
 
+  /// `ID`
+  String get id {
+    return Intl.message(
+      'ID',
+      name: 'id',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Custom ID`
   String get custom_id {
     return Intl.message(
@@ -4235,6 +4245,16 @@ class S {
     return Intl.message(
       'This custom ID is already set as your current ID',
       name: 'tip_custom_id_already_set',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Address not found or cannot be resolved`
+  String get tip_address_not_found {
+    return Intl.message(
+      'Address not found or cannot be resolved',
+      name: 'tip_address_not_found',
       desc: '',
       args: [],
     );

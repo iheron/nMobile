@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nkn_sdk_flutter/utils/hex.dart';
 import 'package:nmobile/common/locator.dart';
 import 'package:nmobile/common/settings.dart';
@@ -134,7 +133,7 @@ class ContactChatProfileScreenState extends BaseStateFulWidgetState<ContactChatP
               return Settings.locale((s) => s.tip_custom_id_already_set, ctx: context);
             }
           }
-          
+
           await service.dispose();
           return null; // Validation passed
         } catch (e) {
@@ -142,7 +141,7 @@ class ContactChatProfileScreenState extends BaseStateFulWidgetState<ContactChatP
         }
       },
     );
-    
+
     if (customId == null || customId.isEmpty) return;
 
     // If we reach here, validation passed. Now submit the data.
@@ -171,10 +170,6 @@ class ContactChatProfileScreenState extends BaseStateFulWidgetState<ContactChatP
       // Show success message
       Toast.show(Settings.locale((s) => s.success, ctx: context));
 
-      // Navigate back
-      if (Navigator.of(this.context).canPop()) {
-        Navigator.of(this.context).pop();
-      }
     } catch (e) {
       // Dismiss loading
       Loading.dismiss();
@@ -189,8 +184,16 @@ class ContactChatProfileScreenState extends BaseStateFulWidgetState<ContactChatP
     return Layout(
       headerColor: application.theme.backgroundColor4,
       header: Header(
-        title: Settings.locale((s) => s.d_chat_address, ctx: context),
+        title: Settings.locale((s) => s.profile, ctx: context),
         backgroundColor: application.theme.backgroundColor4,
+        actions: [
+          IconButton(
+            icon: Asset.iconSvg('more', color: Colors.white, width: 24),
+            onPressed: () {
+              ContactMoreProfileScreen.go(context, this._contact);
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(top: 30, bottom: 30, left: 20, right: 20),
@@ -199,128 +202,64 @@ class ContactChatProfileScreenState extends BaseStateFulWidgetState<ContactChatP
             final customIdState = ref.watch(customIdProvider);
             final hasCustomId = customIdState.customId != null && customIdState.customId!.isNotEmpty;
 
+            // Display customId if available, otherwise display full address
+            final displayId = hasCustomId ? customIdState.customId! : this._contact.address;
+
             return Column(
               children: <Widget>[
-                // Custom ID
+                // ID
                 TextButton(
-                  style: _buttonStyle(topRadius: true, botRadius: hasCustomId, topPad: 12, botPad: 12),
-                  onPressed: () async {
+                  style: _buttonStyle(topRadius: true, botRadius: false, topPad: 20, botPad: 10),
+                  onPressed: () {
                     _modifyCustomId();
                   },
                   child: Row(
                     children: <Widget>[
-                      FaIcon(
-                        FontAwesomeIcons.fingerprint,
-                        size: 24,
-                        color: application.theme.primaryColor,
-                      ),
+                      // Show fingerprint icon for custom ID, chat-id icon for D-Chat address
+                      Asset.image('chat/chat-id.png', color: application.theme.primaryColor, width: 24),
                       SizedBox(width: 10),
                       Label(
-                        Settings.locale((s) => s.custom_id, ctx: context),
+                        Settings.locale((s) => s.id, ctx: context),
                         type: LabelType.bodyRegular,
                         color: application.theme.fontColor1,
                       ),
-                      SizedBox(width: 20),
                       Spacer(),
-                      // Only show loading when there's no cached customId
-                      (customIdState.isLoading && customIdState.customId == null)
-                          ? SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Label(
-                              hasCustomId ? customIdState.customId! : Settings.locale((s) => s.go_to_set, ctx: context),
-                              type: LabelType.bodyRegular,
-                              color: application.theme.fontColor2,
-                              overflow: TextOverflow.fade,
-                              textAlign: TextAlign.right,
-                            ),
-                      Asset.iconSvg(
-                        'right',
-                        width: 24,
+
+                      Icon(
+                        Icons.edit,
                         color: application.theme.fontColor2,
+                        size: 18,
+                      ),
+                    ],
+                  ),
+                ),
+                TextButton(
+                  style: _buttonStyle(topRadius: false, botRadius: true, topPad: 10, botPad: 20),
+                  onPressed: () {
+                    Util.copyText(displayId);
+                    Toast.show(Settings.locale((s) => s.copied, ctx: context));
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(
+                        child: Label(
+                          displayId,
+                          type: LabelType.bodyRegular,
+                          color: application.theme.fontColor2,
+                          softWrap: true,
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Icon(
+                        Icons.content_copy,
+                        color: application.theme.fontColor2,
+                        size: 18,
                       ),
                     ],
                   ),
                 ),
                 SizedBox(height: 24),
-
-                // Show different UI based on whether custom ID is set
-                if (hasCustomId) ...[
-                  // If has custom ID, show "View More Info" button
-                  TextButton(
-                    style: _buttonStyle(topRadius: true, botRadius: true, topPad: 12, botPad: 12),
-                    onPressed: () {
-                      ContactMoreProfileScreen.go(context, this._contact);
-                    },
-                    child: Row(
-                      children: <Widget>[
-                        FaIcon(
-                          FontAwesomeIcons.addressCard,
-                          size: 24,
-                          color: application.theme.primaryColor,
-                        ),
-                        SizedBox(width: 10),
-                        Label(
-                          Settings.locale((s) => s.view_more_info, ctx: context),
-                          type: LabelType.bodyRegular,
-                          color: application.theme.fontColor1,
-                        ),
-                        Spacer(),
-                        Asset.iconSvg(
-                          'right',
-                          width: 24,
-                          color: application.theme.fontColor2,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                ] else ...[
-                  // If no custom ID, show original D-Chat Address card
-                  TextButton(
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.resolveWith((states) => EdgeInsets.all(16)),
-                      backgroundColor: MaterialStateProperty.resolveWith((states) => application.theme.backgroundLightColor),
-                      shape: MaterialStateProperty.resolveWith(
-                        (states) => RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
-                      ),
-                    ),
-                    onPressed: () {
-                      Util.copyText(this._contact.address);
-                      Toast.show(Settings.locale((s) => s.copied, ctx: context));
-                    },
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Label(
-                              Settings.locale((s) => s.d_chat_address, ctx: context),
-                              type: LabelType.bodyRegular,
-                              color: application.theme.fontColor1,
-                            ),
-                            Icon(
-                              Icons.content_copy,
-                              color: application.theme.fontColor2,
-                              size: 18,
-                            )
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Label(
-                          this._contact.address,
-                          type: LabelType.bodyRegular,
-                          color: application.theme.fontColor2,
-                          softWrap: true,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                ],
 
                 // QR Code section
                 Container(

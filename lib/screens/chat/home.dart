@@ -523,17 +523,31 @@ class _ChatHomeScreenState extends BaseStateFulWidgetState<ChatHomeScreen> with 
                           backgroundColor: application.theme.backgroundLightColor.withAlpha(77),
                           child: Asset.iconSvg('user', width: 24, color: application.theme.fontLightColor),
                           onPressed: () async {
+                            ContactSchema? validatedContact;
+                            
                             String? address = await BottomDialog.of(Settings.appContext).showInput(
                               title: Settings.locale((s) => s.new_whisper, ctx: context),
                               inputTip: Settings.locale((s) => s.send_to, ctx: context),
                               inputHint: Settings.locale((s) => s.enter_or_select_a_user_pubkey, ctx: context),
                               // validator: Validator.of(context).identifierNKN(),
                               contactSelect: true,
+                              asyncValidator: (value) async {
+                                if (value.isEmpty) {
+                                  return null; // Allow empty to close dialog
+                                }
+                                
+                                // Validate address exists and cache the result
+                                validatedContact = await contactCommon.resolveByAddress(value, canAdd: true);
+                                if (validatedContact == null) {
+                                  return Settings.locale((s) => s.tip_address_not_found, ctx: context);
+                                }
+                                return null; // Validation passed
+                              },
                             );
-                            Loading.show();
-                            ContactSchema? contact = await contactCommon.resolveByAddress(address, canAdd: true);
-                            Loading.dismiss();
-                            if (contact != null) await ChatMessagesScreen.go(context, contact);
+
+                            if (address != null && address.isNotEmpty && validatedContact != null) {
+                              await ChatMessagesScreen.go(context, validatedContact!);
+                            }
                             if (Navigator.of(this.context).canPop()) Navigator.pop(this.context); // floatActionBtn
                           },
                         ),

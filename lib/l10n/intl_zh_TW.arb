@@ -430,6 +430,7 @@
   "revoke": "撤回",
   "confirm_revoke": "確定要撤回此消息嗎？",
   "edit_custom_id": "編輯自定義ID",
+  "id": "ID",
   "custom_id": "自定義ID",
   "custom_id_tips": "您可以設定自訂ID，以便其他人透過此ID新增您為好友。",
   "tip_input_min_length": "請至少輸入 {length} 個字符。",
@@ -438,6 +439,7 @@
   "tip_submit_failed": "提交失敗",
   "tip_custom_id_taken": "此自訂ID已被其他用戶佔用",
   "tip_custom_id_already_set": "此自訂ID已經是您目前的ID，無需重複設定",
+  "tip_address_not_found": "該地址不存在或無法解析",
   "view_more_info": "查看更多資訊",
   "tip_custom_id_format": "自訂ID只能包含字母、數字或底線"
 }

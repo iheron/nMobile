@@ -643,16 +643,10 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
                           child: Row(
                             children: <Widget>[
                               // Show fingerprint icon for custom ID, chat-id icon for D-Chat address
-                              hasCustomId
-                                  ? FaIcon(
-                                      FontAwesomeIcons.fingerprint,
-                                      size: 24,
-                                      color: application.theme.primaryColor,
-                                    )
-                                  : Asset.image('chat/chat-id.png', color: application.theme.primaryColor, width: 24),
+                              Asset.image('chat/chat-id.png', color: application.theme.primaryColor, width: 24),
                               SizedBox(width: 10),
                               Label(
-                                hasCustomId ? Settings.locale((s) => s.custom_id, ctx: context) : Settings.locale((s) => s.d_chat_address, ctx: context),
+                                Settings.locale((s) => s.id, ctx: context),
                                 type: LabelType.bodyRegular,
                                 color: application.theme.fontColor1,
                               ),
@@ -726,41 +720,6 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
                         ],
                       ),
                     ),
-
-                    /// address
-                    // TextButton(
-                    //   style: _buttonStyle(topRadius: false, botRadius: false, topPad: 12, botPad: 12),
-                    //   onPressed: () {
-                    //     if (this._contact == null) return;
-                    //     ContactChatProfileScreen.go(this.context, this._contact!);
-                    //   },
-                    //   child: Row(
-                    //     children: <Widget>[
-                    //       Asset.image('chat/chat-id.png', color: application.theme.primaryColor, width: 24),
-                    //       SizedBox(width: 10),
-                    //       Label(
-                    //         Settings.locale((s) => s.d_chat_address, ctx: context),
-                    //         type: LabelType.bodyRegular,
-                    //         color: application.theme.fontColor1,
-                    //       ),
-                    //       Spacer(),
-                    //       Expanded(
-                    //         child: Label(
-                    //           _getClientAddressShow(),
-                    //           type: LabelType.bodyRegular,
-                    //           color: application.theme.fontColor2,
-                    //           overflow: TextOverflow.fade,
-                    //           textAlign: TextAlign.right,
-                    //         ),
-                    //       ),
-                    //       Asset.iconSvg(
-                    //         'right',
-                    //         width: 24,
-                    //         color: application.theme.fontColor2,
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
 
                     /// wallet
                     TextButton(
@@ -970,7 +929,7 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
                     Asset.image('chat/chat-id.png', color: application.theme.primaryColor, width: 24),
                     SizedBox(width: 10),
                     Label(
-                      Settings.locale((s) => s.d_chat_address, ctx: context),
+                      Settings.locale((s) => s.id, ctx: context),
                       type: LabelType.bodyRegular,
                       color: application.theme.fontColor1,
                     ),

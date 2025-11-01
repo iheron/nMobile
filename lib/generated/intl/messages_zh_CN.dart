@@ -263,6 +263,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "help": MessageLookupByLibrary.simpleMessage("帮助"),
         "hint_enter_wallet_name": MessageLookupByLibrary.simpleMessage("账户名称"),
         "hours": MessageLookupByLibrary.simpleMessage("小时"),
+        "id": MessageLookupByLibrary.simpleMessage("ID"),
         "image": MessageLookupByLibrary.simpleMessage("图片"),
         "import_contacts": MessageLookupByLibrary.simpleMessage("导入联系人"),
         "import_ethereum_wallet":
@@ -481,6 +482,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "tab_seed": MessageLookupByLibrary.simpleMessage("Seed"),
         "terms": MessageLookupByLibrary.simpleMessage("条款"),
         "tip": MessageLookupByLibrary.simpleMessage("提示"),
+        "tip_address_not_found":
+            MessageLookupByLibrary.simpleMessage("该地址不存在或无法解析"),
         "tip_ask_group_owner_permission":
             MessageLookupByLibrary.simpleMessage("您已不在此群，联系群主邀请您"),
         "tip_custom_id_already_set":

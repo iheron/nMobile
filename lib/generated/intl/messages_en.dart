@@ -314,6 +314,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "hint_enter_wallet_name":
             MessageLookupByLibrary.simpleMessage("Enter wallet name"),
         "hours": MessageLookupByLibrary.simpleMessage("hours"),
+        "id": MessageLookupByLibrary.simpleMessage("ID"),
         "image": MessageLookupByLibrary.simpleMessage("Image"),
         "import_contacts":
             MessageLookupByLibrary.simpleMessage("Import Contacts"),
@@ -574,6 +575,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "tab_seed": MessageLookupByLibrary.simpleMessage("Seed"),
         "terms": MessageLookupByLibrary.simpleMessage("Terms"),
         "tip": MessageLookupByLibrary.simpleMessage("Tips"),
+        "tip_address_not_found": MessageLookupByLibrary.simpleMessage(
+            "Address not found or cannot be resolved"),
         "tip_ask_group_owner_permission": MessageLookupByLibrary.simpleMessage(
             "You are not in this group,ask the group owner for permission"),
         "tip_custom_id_already_set": MessageLookupByLibrary.simpleMessage(

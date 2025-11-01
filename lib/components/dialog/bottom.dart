@@ -300,6 +300,7 @@ class BottomDialog extends BaseStateFulWidget {
     TextEditingController _inputController = TextEditingController();
     _inputController.text = value ?? "";
     ValueNotifier<String?> errorNotifier = ValueNotifier<String?>(null);
+    ValueNotifier<bool> loadingNotifier = ValueNotifier<bool>(false);
 
     return showWithTitle<String?>(
       title: title,
@@ -308,26 +309,53 @@ class BottomDialog extends BaseStateFulWidget {
       canTapClose: canTapClose,
       action: Padding(
         padding: const EdgeInsets.only(left: 20, right: 20, top: 8, bottom: 34),
-        child: Button(
-          text: actionText ?? Settings.locale((s) => s.continue_text, ctx: context),
-          width: double.infinity,
-          onPressed: () async {
-            // Validate minimum length
-            if (minLength > 0 && _inputController.text.length < minLength) {
-              errorNotifier.value = Settings.locale((s) => s.tip_input_min_length(minLength.toString()), ctx: context);
-              return;
-            }
-            
-            // Async validation
-            if (asyncValidator != null) {
-              final error = await asyncValidator(_inputController.text);
-              if (error != null) {
-                errorNotifier.value = error;
-                return;
-              }
-            }
-            
-            if (Navigator.of(this.context).canPop()) Navigator.pop(this.context, _inputController.text);
+        child: ValueListenableBuilder<bool>(
+          valueListenable: loadingNotifier,
+          builder: (context, isLoading, child) {
+            return Button(
+              disabled: isLoading,
+              width: double.infinity,
+              child: isLoading
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(application.theme.fontLightColor),
+                      ),
+                    )
+                  : Text(
+                      actionText ?? Settings.locale((s) => s.continue_text, ctx: context),
+                      style: TextStyle(
+                        fontSize: application.theme.buttonFontSize,
+                        color: application.theme.fontLightColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+              onPressed: () async {
+                // Validate minimum length
+                if (minLength > 0 && _inputController.text.length < minLength) {
+                  errorNotifier.value = Settings.locale((s) => s.tip_input_min_length(minLength.toString()), ctx: context);
+                  return;
+                }
+                
+                // Async validation
+                if (asyncValidator != null) {
+                  loadingNotifier.value = true;
+                  try {
+                    final error = await asyncValidator(_inputController.text);
+                    if (error != null) {
+                      errorNotifier.value = error;
+                      return;
+                    }
+                  } finally {
+                    loadingNotifier.value = false;
+                  }
+                }
+                
+                if (Navigator.of(this.context).canPop()) Navigator.pop(this.context, _inputController.text);
+              },
+            );
           },
         ),
       ),
