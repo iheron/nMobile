@@ -218,6 +218,12 @@ class _ChatSessionListLayoutState extends BaseStateFulWidgetState<ChatSessionLis
     });
   }
 
+  Future _clearUnreadAndBadge(String targetId, int targetType) async {
+    await sessionCommon.setUnReadCount(targetId, targetType, 0, notify: true);
+    SessionSchema? session = await sessionCommon.query(targetId, targetType);
+    Badge.Badge.onCountDown(session?.unReadCount ?? 0); // await
+  }
+
   _popItemMenu(SessionSchema item, int index) {
     showDialog<Null>(
       context: context,
@@ -269,7 +275,10 @@ class _ChatSessionListLayoutState extends BaseStateFulWidgetState<ChatSessionLis
                     backgroundColor: application.theme.strongColor,
                     onPressed: () async {
                       if (Navigator.of(this.context).canPop()) Navigator.pop(this.context);
+                      // Delete session
                       await sessionCommon.delete(item.targetId, item.type, notify: true);
+                      await _clearUnreadAndBadge(item.targetId, item.type); // await
+                      _refreshBadge();
                     },
                   ),
                 );
