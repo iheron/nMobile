@@ -18,6 +18,9 @@ import 'package:nmobile/components/text/fixed_text_field.dart';
 import 'package:nmobile/components/text/label.dart';
 import 'package:nmobile/components/tip/toast.dart';
 import 'package:nmobile/components/topic/item.dart';
+import 'package:nmobile/components/dialog/bottom.dart';
+import 'package:nmobile/components/dialog/create_private_group.dart';
+import 'package:nmobile/components/layout/chat_topic_search.dart';
 import 'package:nmobile/schema/contact.dart';
 import 'package:nmobile/schema/private_group.dart';
 import 'package:nmobile/schema/topic.dart';
@@ -465,63 +468,61 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.only(bottom: 72),
-                itemCount: listItemViewCount,
-                itemBuilder: (context, index) {
-                  int friendItemIndex = index - 1;
-                  int topicItemIndex = index - searchFriendViewCount - 1;
-                  int groupItemIndex = index - searchTopicViewCount - searchFriendViewCount - 1;
-                  /*int strangerItemIndex = index - searchGroupViewCount - searchTopicViewCount - searchFriendViewCount - 1;*/
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: _searchController.text.isNotEmpty ? _buildSearchByIdMenuBar() : _buildActionMenuBar(),
+                  ),
+                  SliverPadding(
+                    padding: EdgeInsets.only(bottom: 72),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          int friendItemIndex = index - 1;
+                          int topicItemIndex = index - searchFriendViewCount - 1;
+                          int groupItemIndex = index - searchTopicViewCount - searchFriendViewCount - 1;
 
-                  if (searchFriendViewCount > 0 && index >= friendStartIndex && index <= friendEndIndex) {
-                    if (index == friendStartIndex) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 12, bottom: 16, left: 16, right: 16),
-                        child: Label(
-                          '($searchFriendDataCount) ${Settings.locale((s) => s.friends, ctx: context)}',
-                          type: LabelType.h3,
-                        ),
-                      );
-                    }
-                    return _getFriendItemView(_searchFriends[friendItemIndex]);
-                  } else if (searchTopicViewCount > 0 && index >= topicStartIndex && index <= topicEndIndex) {
-                    if (index == topicStartIndex) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 24, bottom: 16, left: 16, right: 16),
-                        child: Label(
-                          '($searchTopicDataCount) ${Settings.locale((s) => s.group_chat, ctx: context)}',
-                          type: LabelType.h3,
-                        ),
-                      );
-                    }
-                    return _getTopicItemView(_searchTopics[topicItemIndex]);
-                  } else if (searchGroupViewCount > 0 && index >= groupStartIndex && index <= groupEndIndex) {
-                    if (index == groupStartIndex) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 24, bottom: 16, left: 16, right: 16),
-                        child: Label(
-                          '($searchGroupDataCount) ${Settings.locale((s) => s.group_chat, ctx: context)}',
-                          type: LabelType.h3,
-                        ),
-                      );
-                    }
-                    return _getGroupItemView(_searchGroups[groupItemIndex]);
-                  }
-                  /*else if (searchStrangerViewCount > 0 && index >= strangerStartIndex && index <= strangerEndIndex) {
-                    if (index == strangerStartIndex) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 24, bottom: 16, left: 16, right: 16),
-                        child: Label(
-                          '($searchStrangerDataCount) ${Settings.locale((s) => s.recent, ctx: context)}',
-                          type: LabelType.h3,
-                        ),
-                      );
-                    }
-                    return _getStrangerItemView(_searchStrangers[strangerItemIndex]);
-                  }*/
-                  return SizedBox.shrink();
-                },
+                          if (searchFriendViewCount > 0 && index >= friendStartIndex && index <= friendEndIndex) {
+                            if (index == friendStartIndex) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 12, bottom: 16, left: 16, right: 16),
+                                child: Label(
+                                  '($searchFriendDataCount) ${Settings.locale((s) => s.friends, ctx: context)}',
+                                  type: LabelType.h3,
+                                ),
+                              );
+                            }
+                            return _getFriendItemView(_searchFriends[friendItemIndex]);
+                          } else if (searchTopicViewCount > 0 && index >= topicStartIndex && index <= topicEndIndex) {
+                            if (index == topicStartIndex) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 24, bottom: 16, left: 16, right: 16),
+                                child: Label(
+                                  '($searchTopicDataCount) ${Settings.locale((s) => s.group_chat, ctx: context)}',
+                                  type: LabelType.h3,
+                                ),
+                              );
+                            }
+                            return _getTopicItemView(_searchTopics[topicItemIndex]);
+                          } else if (searchGroupViewCount > 0 && index >= groupStartIndex && index <= groupEndIndex) {
+                            if (index == groupStartIndex) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 24, bottom: 16, left: 16, right: 16),
+                                child: Label(
+                                  '($searchGroupDataCount) ${Settings.locale((s) => s.group_chat, ctx: context)}',
+                                  type: LabelType.h3,
+                                ),
+                              );
+                            }
+                            return _getGroupItemView(_searchGroups[groupItemIndex]);
+                          }
+                          return SizedBox.shrink();
+                        },
+                        childCount: listItemViewCount,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -770,6 +771,188 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  _buttonStyle({bool topRadius = true, bool botRadius = true, double topPad = 12, double botPad = 12}) {
+    return ButtonStyle(
+      backgroundColor: MaterialStateProperty.resolveWith((state) => application.theme.backgroundLightColor),
+      padding: MaterialStateProperty.resolveWith((states) => EdgeInsets.only(left: 16, right: 16, top: topPad, bottom: botPad)),
+      shape: MaterialStateProperty.resolveWith(
+        (states) => RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: topRadius ? Radius.circular(12) : Radius.zero,
+            bottom: botRadius ? Radius.circular(12) : Radius.zero,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionMenuBar() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        children: [
+          TextButton(
+            style: _buttonStyle(topRadius: true, botRadius: false, topPad: 15, botPad: 15),
+            onPressed: () async {
+              ContactSchema? validatedContact;
+
+              String? address = await BottomDialog.of(Settings.appContext).showInput(
+                title: Settings.locale((s) => s.new_whisper, ctx: context),
+                inputTip: Settings.locale((s) => s.send_to, ctx: context),
+                inputHint: Settings.locale((s) => s.enter_or_select_a_user_pubkey, ctx: context),
+                contactSelect: true,
+                asyncValidator: (value) async {
+                  if (value.isEmpty) {
+                    return null;
+                  }
+
+                  validatedContact = await contactCommon.resolveByAddress(value, canAdd: true);
+                  if (validatedContact == null) {
+                    return Settings.locale((s) => s.tip_address_not_found, ctx: context);
+                  }
+                  return null;
+                },
+              );
+
+              if (address != null && address.isNotEmpty && validatedContact != null) {
+                await ChatMessagesScreen.go(context, validatedContact!);
+              }
+            },
+            child: Row(
+              children: <Widget>[
+                Asset.iconSvg('user', color: application.theme.primaryColor, width: 24),
+                SizedBox(width: 10),
+                Label(
+                  Settings.locale((s) => s.new_whisper, ctx: context),
+                  type: LabelType.bodyRegular,
+                  color: application.theme.fontColor1,
+                ),
+                Spacer(),
+                Asset.iconSvg(
+                  'right',
+                  width: 24,
+                  color: application.theme.fontColor2,
+                ),
+              ],
+            ),
+          ),
+          Divider(height: 0, color: application.theme.dividerColor),
+          TextButton(
+            style: _buttonStyle(topRadius: false, botRadius: false, topPad: 15, botPad: 15),
+            onPressed: () {
+              BottomDialog.of(Settings.appContext).showWithTitle(
+                height: Settings.screenHeight() * 0.8,
+                title: Settings.locale((s) => s.create_channel, ctx: context),
+                child: ChatTopicSearchLayout(),
+              );
+            },
+            child: Row(
+              children: <Widget>[
+                Asset.iconSvg('group', color: application.theme.primaryColor, width: 24),
+                SizedBox(width: 10),
+                Label(
+                  Settings.locale((s) => s.new_public_group, ctx: context),
+                  type: LabelType.bodyRegular,
+                  color: application.theme.fontColor1,
+                ),
+                Spacer(),
+                Asset.iconSvg(
+                  'right',
+                  width: 24,
+                  color: application.theme.fontColor2,
+                ),
+              ],
+            ),
+          ),
+          Divider(height: 0, color: application.theme.dividerColor),
+          TextButton(
+            style: _buttonStyle(topRadius: false, botRadius: true, topPad: 15, botPad: 15),
+            onPressed: () {
+              BottomDialog.of(Settings.appContext).showWithTitle(
+                height: 300,
+                title: Settings.locale((s) => s.create_private_group, ctx: context),
+                child: CreatePrivateGroup(),
+              );
+            },
+            child: Row(
+              children: <Widget>[
+                Asset.iconSvg('lock', color: application.theme.primaryColor, width: 24),
+                SizedBox(width: 10),
+                Label(
+                  Settings.locale((s) => s.new_private_group, ctx: context),
+                  type: LabelType.bodyRegular,
+                  color: application.theme.fontColor1,
+                ),
+                Spacer(),
+                Asset.iconSvg(
+                  'right',
+                  width: 24,
+                  color: application.theme.fontColor2,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchByIdMenuBar() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: TextButton(
+        style: _buttonStyle(topRadius: true, botRadius: true, topPad: 15, botPad: 15),
+        onPressed: () async {
+          String searchText = _searchController.text.trim();
+          if (searchText.isEmpty) {
+            Toast.show(Settings.locale((s) => s.search, ctx: context));
+            return;
+          }
+
+          Loading.show();
+          try {
+            ContactSchema? validatedContact = await contactCommon.resolveByAddress(searchText, canAdd: true);
+            Loading.dismiss();
+
+            if (validatedContact == null) {
+              if (!mounted) return;
+              Toast.show(Settings.locale((s) => s.tip_address_not_found, ctx: context));
+              return;
+            }
+
+            if (!mounted) return;
+            await ChatMessagesScreen.go(context, validatedContact);
+          } catch (e, st) {
+            Loading.dismiss();
+            handleError(e, st);
+            if (!mounted) return;
+            Toast.show(Settings.locale((s) => s.something_went_wrong, ctx: context));
+          }
+        },
+        child: Row(
+          children: <Widget>[
+            Asset.iconSvg('search', color: application.theme.primaryColor, width: 24),
+            SizedBox(width: 10),
+            Expanded(
+              child: Label(
+                '${Settings.locale((s) => s.search, ctx: context)} "${_searchController.text}"',
+                type: LabelType.bodyRegular,
+                color: application.theme.fontColor1,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Asset.iconSvg(
+              'right',
+              width: 24,
+              color: application.theme.fontColor2,
+            ),
+          ],
+        ),
       ),
     );
   }

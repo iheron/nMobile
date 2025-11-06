@@ -776,13 +776,38 @@ class _ChatMessagesScreenState extends BaseStateFulWidgetState<ChatMessagesScree
                       itemBuilder: (BuildContext context, int index) {
                         if (index < 0 || index >= _messages.length) return SizedBox.shrink();
                         MessageSchema msg = _messages[index];
+                        bool shouldShowResend = false;
+                        if (msg.isOutbound && 
+                            msg.status >= MessageStatus.Success && 
+                            msg.status < MessageStatus.Receipt) {
+                          if (msg.status == MessageStatus.Error) {
+                            shouldShowResend = true;
+                          } else {
+                            int now = DateTime.now().millisecondsSinceEpoch;
+                            int sendAt = msg.sendAt;
+                            int timeDiff = now - sendAt;
+                            bool isWithin10Seconds = timeDiff < 10000; // 10秒 = 10000毫秒
+                            
+                            if (!isWithin10Seconds) {
+                              if (index > 0) {
+                                for (int i = 0; i < index; i++) {
+                                  MessageSchema checkMsg = _messages[i];
+                                  if (checkMsg.isOutbound && 
+                                      checkMsg.status >= MessageStatus.Receipt) {
+                                    shouldShowResend = true;
+                                    break;
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                        bool lastMessageHasReceipt = shouldShowResend;
                         return ChatMessageItem(
                           message: msg,
-                          // sender: _sender,
-                          // topic: _topic,
-                          // privateGroup: _privateGroup,
                           prevMessage: (index - 1) >= 0 ? _messages[index - 1] : null,
                           nextMessage: (index + 1) < _messages.length ? _messages[index + 1] : null,
+                          lastMessageHasReceipt: lastMessageHasReceipt,
                           onAvatarPress: (ContactSchema contact, _) {
                             ContactProfileScreen.go(context, schema: contact);
                           },

@@ -29,6 +29,7 @@ class ChatBubble extends BaseStateFulWidget {
   final bool showTimeAndStatus;
   final bool hideTopMargin;
   final bool hideBotMargin;
+  final bool lastMessageHasReceipt;
   final Function(String)? onResend;
 
   ChatBubble({
@@ -36,6 +37,7 @@ class ChatBubble extends BaseStateFulWidget {
     this.showTimeAndStatus = true,
     this.hideTopMargin = false,
     this.hideBotMargin = false,
+    this.lastMessageHasReceipt = false,
     this.onResend,
   });
 
@@ -199,39 +201,15 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
   }
 
   Widget _widgetStatusTip(bool self) {
-    // bool isSending = _message.status == MessageStatus.Sending;
     bool isSendFail = _message.status == MessageStatus.Error;
-    // bool isSendSuccess = _message.status == MessageStatus.SendSuccess;
-    // bool isSendReceipt = _message.status == MessageStatus.SendReceipt;
+    bool shouldShowResend = isSendFail;
+    if (!shouldShowResend && widget.lastMessageHasReceipt && _message.isOutbound) {
+      if (_message.status >= MessageStatus.Success && _message.status < MessageStatus.Receipt) {
+        shouldShowResend = true;
+      }
+    }
 
-    // bool canProgress = _message.isContentFile && !_message.isTopic;
-
-    // bool showSending = isSending && !canProgress;
-    // bool showProgress = isSending && canProgress && _uploadProgress < 1;
-
-    // if (showSending) {
-    //   return Padding(
-    //     padding: const EdgeInsets.symmetric(horizontal: 10),
-    //     child: SpinKitRing(
-    //       color: application.theme.fontColor4,
-    //       lineWidth: 1,
-    //       size: 15,
-    //     ),
-    //   );
-    // } else if (showProgress) {
-    //   return Container(
-    //     width: 40,
-    //     height: 40,
-    //     padding: EdgeInsets.all(10),
-    //     child: CircularProgressIndicator(
-    //       backgroundColor: application.theme.fontColor4.withAlpha(80),
-    //       color: application.theme.primaryColor.withAlpha(200),
-    //       strokeWidth: 2,
-    //       value: _uploadProgress,
-    //     ),
-    //   );
-    // } else
-    if (isSendFail) {
+    if (shouldShowResend) {
       return ButtonIcon(
         icon: Icon(
           FontAwesomeIcons.circleExclamation,
@@ -258,27 +236,6 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
         },
       );
     }
-    // else if (isSendSuccess) {
-    //   return Container(
-    //     width: 5,
-    //     height: 5,
-    //     margin: EdgeInsets.only(left: 10, right: 10, bottom: 5, top: 5),
-    //     decoration: BoxDecoration(
-    //       borderRadius: BorderRadius.circular(5),
-    //       color: application.theme.strongColor.withAlpha(127),
-    //     ),
-    //   );
-    // } else if (isSendReceipt) {
-    //   return Container(
-    //     width: 5,
-    //     height: 5,
-    //     margin: EdgeInsets.only(left: 10, right: 10, bottom: 5, top: 5),
-    //     decoration: BoxDecoration(
-    //       borderRadius: BorderRadius.circular(5),
-    //       color: application.theme.successColor.withAlpha(127),
-    //     ),
-    //   );
-    // }
     return SizedBox.shrink();
   }
 

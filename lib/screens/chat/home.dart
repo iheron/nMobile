@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:nmobile/blocs/wallet/wallet_bloc.dart';
 import 'package:nmobile/blocs/wallet/wallet_state.dart';
@@ -9,21 +10,14 @@ import 'package:nmobile/common/client/client.dart';
 import 'package:nmobile/common/locator.dart';
 import 'package:nmobile/common/settings.dart';
 import 'package:nmobile/components/base/stateful.dart';
-import 'package:nmobile/components/button/button.dart';
 import 'package:nmobile/components/contact/header.dart';
-import 'package:nmobile/components/dialog/bottom.dart';
-import 'package:nmobile/components/dialog/create_private_group.dart';
-import 'package:nmobile/components/dialog/loading.dart';
-import 'package:nmobile/components/layout/chat_topic_search.dart';
 import 'package:nmobile/components/layout/header.dart';
 import 'package:nmobile/components/layout/layout.dart';
 import 'package:nmobile/components/text/label.dart';
-import 'package:nmobile/routes/routes.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nmobile/providers/connected_provider.dart';
+import 'package:nmobile/routes/routes.dart';
 import 'package:nmobile/schema/contact.dart';
 import 'package:nmobile/schema/wallet.dart';
-import 'package:nmobile/screens/chat/messages.dart';
 import 'package:nmobile/screens/chat/no_connect.dart';
 import 'package:nmobile/screens/chat/no_wallet.dart';
 import 'package:nmobile/screens/chat/session_list.dart';
@@ -40,8 +34,6 @@ class ChatHomeScreen extends BaseStateFulWidget {
 }
 
 class _ChatHomeScreenState extends BaseStateFulWidgetState<ChatHomeScreen> with AutomaticKeepAliveClientMixin, RouteAware, Tag {
-  GlobalKey _floatingActionKey = GlobalKey();
-
   StreamSubscription? _upgradeTipListen;
   StreamSubscription? _dbOpenedSubscription;
 
@@ -57,7 +49,6 @@ class _ChatHomeScreenState extends BaseStateFulWidgetState<ChatHomeScreen> with 
   int clientConnectStatus = ClientConnectStatus.connecting;
 
   bool isLoginProgress = false;
-  // connected state managed by Riverpod connectedProvider
 
   @override
   void onRefreshArguments() {}
@@ -248,20 +239,6 @@ class _ChatHomeScreenState extends BaseStateFulWidgetState<ChatHomeScreen> with 
                 )
               ],
             ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-            floatingActionButton: Padding(
-              padding: EdgeInsets.only(bottom: 60, right: 4),
-              child: FloatingActionButton(
-                key: _floatingActionKey,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
-                elevation: 12,
-                backgroundColor: application.theme.primaryColor,
-                child: Asset.iconSvg('pencil', width: 24),
-                onPressed: () {
-                  _showFloatActionMenu();
-                },
-              ),
-            ),
             body: (_contactMe != null) && dbOpen
                 ? ChatSessionListLayout(_contactMe!)
                 : Container(
@@ -389,177 +366,6 @@ class _ChatHomeScreenState extends BaseStateFulWidgetState<ChatHomeScreen> with 
           ],
         ),
       ),
-    );
-  }
-
-  _showFloatActionMenu() {
-    double btnSize = 48;
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return GestureDetector(
-          onTap: () {
-            if (Navigator.of(this.context).canPop()) Navigator.pop(this.context);
-          },
-          child: Align(
-            alignment: Alignment.bottomRight,
-            child: Container(
-              padding: EdgeInsets.only(bottom: 67, right: 16),
-              child: Row(
-                children: [
-                  Spacer(),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      SizedBox(
-                        height: btnSize,
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(12)),
-                              color: Colors.black26,
-                            ),
-                            child: Label(
-                              Settings.locale((s) => s.new_private_group, ctx: context),
-                              height: 1.2,
-                              type: LabelType.h4,
-                              dark: true,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      SizedBox(
-                        height: btnSize,
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(12)),
-                              color: Colors.black26,
-                            ),
-                            child: Label(
-                              Settings.locale((s) => s.new_public_group, ctx: context),
-                              height: 1.2,
-                              type: LabelType.h4,
-                              dark: true,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      SizedBox(
-                        height: btnSize,
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(12)),
-                              color: Colors.black26,
-                            ),
-                            child: Label(
-                              Settings.locale((s) => s.new_whisper, ctx: context),
-                              height: 1.2,
-                              type: LabelType.h4,
-                              dark: true,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 8),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(32)),
-                      color: application.theme.primaryColor,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Button(
-                          width: btnSize,
-                          height: btnSize,
-                          fontColor: application.theme.fontLightColor,
-                          backgroundColor: application.theme.backgroundLightColor.withAlpha(77),
-                          child: Asset.iconSvg('lock', width: 22, color: application.theme.fontLightColor),
-                          onPressed: () async {
-                            if (Navigator.of(this.context).canPop()) Navigator.pop(this.context);
-                            BottomDialog.of(Settings.appContext).showWithTitle(
-                              height: 300,
-                              title: Settings.locale((s) => s.create_private_group, ctx: context),
-                              child: CreatePrivateGroup(),
-                            );
-                          },
-                        ),
-                        SizedBox(height: 10),
-                        Button(
-                          width: btnSize,
-                          height: btnSize,
-                          fontColor: application.theme.fontLightColor,
-                          backgroundColor: application.theme.backgroundLightColor.withAlpha(77),
-                          child: Asset.iconSvg('group', width: 22, color: application.theme.fontLightColor),
-                          onPressed: () async {
-                            if (Navigator.of(this.context).canPop()) Navigator.pop(this.context);
-                            BottomDialog.of(Settings.appContext).showWithTitle(
-                              height: Settings.screenHeight() * 0.8,
-                              title: Settings.locale((s) => s.create_channel, ctx: context),
-                              child: ChatTopicSearchLayout(),
-                            );
-                          },
-                        ),
-                        SizedBox(height: 10),
-                        Button(
-                          width: btnSize,
-                          height: btnSize,
-                          fontColor: application.theme.fontLightColor,
-                          backgroundColor: application.theme.backgroundLightColor.withAlpha(77),
-                          child: Asset.iconSvg('user', width: 24, color: application.theme.fontLightColor),
-                          onPressed: () async {
-                            ContactSchema? validatedContact;
-                            
-                            String? address = await BottomDialog.of(Settings.appContext).showInput(
-                              title: Settings.locale((s) => s.new_whisper, ctx: context),
-                              inputTip: Settings.locale((s) => s.send_to, ctx: context),
-                              inputHint: Settings.locale((s) => s.enter_or_select_a_user_pubkey, ctx: context),
-                              // validator: Validator.of(context).identifierNKN(),
-                              contactSelect: true,
-                              asyncValidator: (value) async {
-                                if (value.isEmpty) {
-                                  return null; // Allow empty to close dialog
-                                }
-                                
-                                // Validate address exists and cache the result
-                                validatedContact = await contactCommon.resolveByAddress(value, canAdd: true);
-                                if (validatedContact == null) {
-                                  return Settings.locale((s) => s.tip_address_not_found, ctx: context);
-                                }
-                                return null; // Validation passed
-                              },
-                            );
-
-                            if (address != null && address.isNotEmpty && validatedContact != null) {
-                              await ChatMessagesScreen.go(context, validatedContact!);
-                            }
-                            if (Navigator.of(this.context).canPop()) Navigator.pop(this.context); // floatActionBtn
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }
