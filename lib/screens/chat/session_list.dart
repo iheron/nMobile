@@ -68,7 +68,7 @@ class _ChatSessionListLayoutState extends BaseStateFulWidgetState<ChatSessionLis
   void onRefreshArguments() {
     bool sameUser = _current?.id == widget.current.id;
     _current = widget.current;
-    if (!sameUser) {
+    if (_current == null || !sameUser) {
       _getDataSessions(true);
     }
 
@@ -152,8 +152,6 @@ class _ChatSessionListLayoutState extends BaseStateFulWidgetState<ChatSessionLis
     // unread
     _refreshBadge(delayMs: 1000);
 
-    // initial load
-    _getDataSessions(true);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _searchFocusNode.unfocus();
@@ -231,6 +229,7 @@ class _ChatSessionListLayoutState extends BaseStateFulWidgetState<ChatSessionLis
     await _queue.add(() async {
       _sessionList = _sessionList.where((element) => !((element.targetId == targetId) && (element.type == targetType))).toList();
     });
+    
     _performSearch(_searchQuery);
   }
 
