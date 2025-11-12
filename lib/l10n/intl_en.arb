@@ -441,5 +441,6 @@
   "tip_custom_id_already_set": "This custom ID is already set as your current ID",
   "tip_address_not_found": "Address not found or cannot be resolved",
   "view_more_info": "View More Info",
-  "tip_custom_id_format": "Custom ID can only contain letters, numbers, or underscores"
+  "tip_custom_id_format": "Custom ID can only contain letters, numbers, or underscores",
+  "new_chat": "New Chat"
 }

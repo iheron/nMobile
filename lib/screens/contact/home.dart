@@ -387,7 +387,7 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
     return Layout(
       headerColor: application.theme.primaryColor,
       header: Header(
-        title: this._navTitle.isEmpty ? Settings.locale((s) => s.contacts, ctx: context) : this._navTitle,
+        title: this._navTitle.isEmpty ? Settings.locale((s) => s.new_chat, ctx: context) : this._navTitle,
         actions: [
           IconButton(
             icon: Asset.iconSvg(

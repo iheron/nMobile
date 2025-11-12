@@ -360,6 +360,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "need_microphone_permission":
             MessageLookupByLibrary.simpleMessage("需要麦克风权限"),
         "need_re_subscribe": MessageLookupByLibrary.simpleMessage("需要重新订阅"),
+        "new_chat": MessageLookupByLibrary.simpleMessage("新聊天"),
         "new_message": MessageLookupByLibrary.simpleMessage("新消息"),
         "new_private_group": MessageLookupByLibrary.simpleMessage("新建私有群"),
         "new_public_group": MessageLookupByLibrary.simpleMessage("新建公有群"),

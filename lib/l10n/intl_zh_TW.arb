@@ -441,5 +441,6 @@
   "tip_custom_id_already_set": "此自訂ID已經是您目前的ID，無需重複設定",
   "tip_address_not_found": "該地址不存在或無法解析",
   "view_more_info": "查看更多資訊",
-  "tip_custom_id_format": "自訂ID只能包含字母、數字或底線"
+  "tip_custom_id_format": "自訂ID只能包含字母、數字或底線",
+  "new_chat": "新聊天"
 }

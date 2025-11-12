@@ -4279,6 +4279,16 @@ class S {
       args: [],
     );
   }
+
+  /// `New Chat`
+  String get new_chat {
+    return Intl.message(
+      'New Chat',
+      name: 'new_chat',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

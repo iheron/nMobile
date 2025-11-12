@@ -433,6 +433,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Need microphone permission"),
         "need_re_subscribe":
             MessageLookupByLibrary.simpleMessage("Need to re-subscribe"),
+        "new_chat": MessageLookupByLibrary.simpleMessage("New Chat"),
         "new_message": MessageLookupByLibrary.simpleMessage("New Message"),
         "new_private_group":
             MessageLookupByLibrary.simpleMessage("New Private Group"),
