@@ -4289,6 +4289,26 @@ class S {
       args: [],
     );
   }
+
+  /// `Update App`
+  String get update_app {
+    return Intl.message(
+      'Update App',
+      name: 'update_app',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ignore`
+  String get ignore {
+    return Intl.message(
+      'Ignore',
+      name: 'ignore',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -442,5 +442,7 @@
   "tip_address_not_found": "该地址不存在或无法解析",
   "view_more_info": "查看更多信息",
   "tip_custom_id_format": "自定义ID只能包含字母、数字或下划线",
-  "new_chat": "新聊天"
+  "new_chat": "新聊天",
+  "update_app": "更新App",
+  "ignore": "忽略"
 }

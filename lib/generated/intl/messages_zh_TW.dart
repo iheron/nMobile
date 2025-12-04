@@ -264,6 +264,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "hint_enter_wallet_name": MessageLookupByLibrary.simpleMessage("賬戶名稱"),
         "hours": MessageLookupByLibrary.simpleMessage("小時"),
         "id": MessageLookupByLibrary.simpleMessage("ID"),
+        "ignore": MessageLookupByLibrary.simpleMessage("忽略"),
         "image": MessageLookupByLibrary.simpleMessage("圖片"),
         "import_contacts": MessageLookupByLibrary.simpleMessage("導入聯繫人"),
         "import_ethereum_wallet":
@@ -533,6 +534,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "unavailable_device": MessageLookupByLibrary.simpleMessage("不支持的設備"),
         "unsubscribe": MessageLookupByLibrary.simpleMessage("退出"),
         "unsubscribed": MessageLookupByLibrary.simpleMessage("已退出"),
+        "update_app": MessageLookupByLibrary.simpleMessage("更新App"),
         "update_burn_after_reading":
             MessageLookupByLibrary.simpleMessage("設置了閱後即焚時間"),
         "updated_at": MessageLookupByLibrary.simpleMessage("更新"),

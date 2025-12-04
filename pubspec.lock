@@ -1536,6 +1536,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.0"
+  store_checker:
+    dependency: "direct main"
+    description:
+      name: store_checker
+      sha256: f191b6f1035caff62137c365cba21ad1a3c82c0369b522639052cd29fb48720f
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.8.0"
   stream_channel:
     dependency: transitive
     description:
@@ -1704,6 +1712,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.2.0"
+  version:
+    dependency: "direct main"
+    description:
+      name: version
+      sha256: "3d4140128e6ea10d83da32fef2fa4003fccbf6852217bb854845802f04191f94"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.0.2"
   vibration:
     dependency: "direct main"
     description:

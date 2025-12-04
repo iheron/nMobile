@@ -21,6 +21,8 @@ import 'package:nmobile/utils/asset.dart';
 import 'package:nmobile/utils/logger.dart';
 import 'package:share_handler/share_handler.dart';
 
+import 'upgrade/upgrade_checker.dart';
+
 class AppScreen extends StatefulWidget {
   static const String routeName = '/';
   static final String argIndex = "index";
@@ -80,6 +82,8 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
       // await backgroundFetchService.install();
       await localNotification.init();
       await audioHelper.init();
+
+      UpgradeChecker.checkAndShowDialog(Settings.appContext);
     });
     application.mounted(); // await
 
@@ -216,12 +220,12 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (Platform.isAndroid) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop && Platform.isAndroid) {
           await Common.backDesktop();
         }
-        return false;
       },
       child: Scaffold(
         backgroundColor: application.theme.backgroundColor,

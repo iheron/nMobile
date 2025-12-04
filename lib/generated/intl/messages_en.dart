@@ -315,6 +315,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Enter wallet name"),
         "hours": MessageLookupByLibrary.simpleMessage("hours"),
         "id": MessageLookupByLibrary.simpleMessage("ID"),
+        "ignore": MessageLookupByLibrary.simpleMessage("Ignore"),
         "image": MessageLookupByLibrary.simpleMessage("Image"),
         "import_contacts":
             MessageLookupByLibrary.simpleMessage("Import Contacts"),
@@ -633,6 +634,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("unsupported device"),
         "unsubscribe": MessageLookupByLibrary.simpleMessage("Leave"),
         "unsubscribed": MessageLookupByLibrary.simpleMessage("Leaved"),
+        "update_app": MessageLookupByLibrary.simpleMessage("Update App"),
         "update_burn_after_reading": MessageLookupByLibrary.simpleMessage(
             "set the disappearing message timer"),
         "updated_at": MessageLookupByLibrary.simpleMessage("Updated at"),
