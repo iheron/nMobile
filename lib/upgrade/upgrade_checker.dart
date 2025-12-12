@@ -96,6 +96,7 @@ class UpgradeChecker {
         break;
       case 'en':
         releaseNotes = appcast.releaseNotes['en'] ?? '';
+        break;
       default:
         releaseNotes = appcast.releaseNotes['en'] ?? '';
         break;
