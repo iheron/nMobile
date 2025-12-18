@@ -24,7 +24,6 @@ import 'package:nmobile/screens/chat/no_wallet.dart';
 import 'package:nmobile/screens/chat/session_list.dart';
 import 'package:nmobile/screens/contact/home.dart';
 import 'package:nmobile/screens/contact/profile.dart';
-import 'package:nmobile/utils/asset.dart';
 import 'package:nmobile/utils/logger.dart';
 
 class ChatHomeScreen extends BaseStateFulWidget {
@@ -203,7 +202,7 @@ class _ChatHomeScreenState extends BaseStateFulWidgetState<ChatHomeScreen> with 
             return ChatNoWalletLayout();
           } else if (!dbOpen && (dbUpdateTip?.isNotEmpty == true)) {
             return _dbUpgradeTip();
-          } else if (!connectedByProvider || (state.defaultWallet() == null)) {
+          } else if (!dbOpen || !connectedByProvider || (state.defaultWallet() == null)) {
             return ChatNoConnectLayout((w) async {
               bool succeed = await _tryLogin(wallet: w);
               if (succeed) {

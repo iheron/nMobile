@@ -371,7 +371,7 @@ class _ChatSendBarState extends BaseStateFulWidgetState<ChatSendBar> {
       child: Container(
         height: ActionHeight,
         color: application.theme.backgroundColor1,
-        child: clientConnectStatus == ClientConnectStatus.connected
+        child: clientConnectStatus == ClientConnectStatus.connected || clientConnectStatus == ClientConnectStatus.connectPing
             ? Row(
                 children: <Widget>[
                   Expanded(

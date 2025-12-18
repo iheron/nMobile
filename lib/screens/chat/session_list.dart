@@ -13,9 +13,7 @@ import 'package:nmobile/components/dialog/modal.dart';
 import 'package:nmobile/components/text/label.dart';
 import 'package:nmobile/schema/contact.dart';
 import 'package:nmobile/schema/message.dart';
-import 'package:nmobile/schema/private_group.dart';
 import 'package:nmobile/schema/session.dart';
-import 'package:nmobile/schema/topic.dart';
 import 'package:nmobile/screens/chat/messages.dart';
 import 'package:nmobile/screens/chat/no_message.dart';
 import 'package:nmobile/storages/settings.dart';
@@ -152,7 +150,6 @@ class _ChatSessionListLayoutState extends BaseStateFulWidgetState<ChatSessionLis
     // unread
     _refreshBadge(delayMs: 1000);
 
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _searchFocusNode.unfocus();
     });
@@ -229,7 +226,7 @@ class _ChatSessionListLayoutState extends BaseStateFulWidgetState<ChatSessionLis
     await _queue.add(() async {
       _sessionList = _sessionList.where((element) => !((element.targetId == targetId) && (element.type == targetType))).toList();
     });
-    
+
     _performSearch(_searchQuery);
   }
 
@@ -448,13 +445,18 @@ class _ChatSessionListLayoutState extends BaseStateFulWidgetState<ChatSessionLis
   }
 
   Widget _sessionListView() {
-    return Column(
-      children: [
-        Expanded(
-          flex: 0,
-          child: GestureDetector(
-            onTap: () {},
-            child: Container(
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      behavior: HitTestBehavior.translucent,
+      child: ListView.builder(
+        padding: EdgeInsets.only(bottom: 80 + Settings.screenHeight() * 0.05),
+        controller: _scrollController,
+        itemCount: _filteredSessionList.length + 1,
+        itemBuilder: (BuildContext context, int index) {
+          if (index == 0) {
+            return Container(
               padding: const EdgeInsets.only(left: 16, right: 16, top: 24, bottom: 12),
               child: Container(
                 decoration: BoxDecoration(
@@ -484,21 +486,23 @@ class _ChatSessionListLayoutState extends BaseStateFulWidgetState<ChatSessionLis
                         style: TextStyle(fontSize: 14, height: 1.5),
                         decoration: InputDecoration(
                           hintText: Settings.locale((s) => s.search, ctx: context),
-                          contentPadding: const EdgeInsets.only(left: 0, right: 16, top: 9, bottom: 9),
                           suffixIcon: _searchController.text.isNotEmpty
-                              ? IconButton(
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    _searchQuery = "";
-                                    _performSearch("");
-                                    _searchFocusNode.unfocus();
-                                    setState(() {});
-                                  },
-                                  icon: Asset.iconSvg(
-                                    'close',
-                                    width: 16,
-                                    color: application.theme.fontColor2,
-                                  ))
+                              ? SizedBox(
+                                  height: 38,
+                                  child: IconButton(
+                                      onPressed: () {
+                                        _searchController.clear();
+                                        _searchQuery = "";
+                                        _performSearch("");
+                                        _searchFocusNode.unfocus();
+                                        setState(() {});
+                                      },
+                                      icon: Asset.iconSvg(
+                                        'close',
+                                        width: 16,
+                                        color: application.theme.fontColor2,
+                                      )),
+                                )
                               : null,
                           suffixIconConstraints: BoxConstraints(minHeight: 24, minWidth: 24),
                           border: UnderlineInputBorder(
@@ -511,44 +515,31 @@ class _ChatSessionListLayoutState extends BaseStateFulWidgetState<ChatSessionLis
                   ],
                 ),
               ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
-            },
-            behavior: HitTestBehavior.translucent,
-            child: ListView.builder(
-              padding: EdgeInsets.only(bottom: 80 + Settings.screenHeight() * 0.05),
-              controller: _scrollController,
-              itemCount: _filteredSessionList.length,
-              itemBuilder: (BuildContext context, int index) {
-                if (index < 0 || index >= _filteredSessionList.length) return SizedBox.shrink();
-                var session = _filteredSessionList[index];
-                return Column(
-                  children: [
-                    ChatSessionItem(
-                      session: session,
-                      onTap: (who) async {
-                        FocusScope.of(context).unfocus();
-                        ChatMessagesScreen.go(context, who).then((value) {
-                          _refreshBadge(delayMs: 0);
-                        });
-                      },
-                      onLongPress: (who) {
-                        _popItemMenu(session, index);
-                      },
-                    ),
-                    Divider(color: session.isTop ? application.theme.backgroundColor3.withAlpha(120) : application.theme.dividerColor, height: 0, indent: 70, endIndent: 12),
-                  ],
-                );
-              },
-            ),
-          ),
-        ),
-      ],
+            );
+          }
+
+          int sessionIndex = index - 1;
+          if (sessionIndex < 0 || sessionIndex >= _filteredSessionList.length) return SizedBox.shrink();
+          var session = _filteredSessionList[sessionIndex];
+          return Column(
+            children: [
+              ChatSessionItem(
+                session: session,
+                onTap: (who) async {
+                  FocusScope.of(context).unfocus();
+                  ChatMessagesScreen.go(context, who).then((value) {
+                    _refreshBadge(delayMs: 0);
+                  });
+                },
+                onLongPress: (who) {
+                  _popItemMenu(session, sessionIndex);
+                },
+              ),
+              Divider(color: session.isTop ? application.theme.backgroundColor3.withAlpha(120) : application.theme.dividerColor, height: 0, indent: 70, endIndent: 12),
+            ],
+          );
+        },
+      ),
     );
   }
 }

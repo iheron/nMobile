@@ -156,7 +156,11 @@ class DB {
         }
       }
     }
-    if (database != null) _openedSink.add(true);
+    if (database != null) {
+      _openedSink.add(true);
+    } else {
+      _openedSink.add(false);
+    }
   }
 
   Future<Database?> _tryOpenDB(String path, String password, {String publicKey = "", bool upgradeTip = false}) async {
