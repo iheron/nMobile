@@ -229,9 +229,9 @@ class SearchClient {
     }
 
     // Validate customId if provided
-    if (customId != null && customId.isNotEmpty && customId.length < 3) {
+    if (customId != null && customId.isNotEmpty && customId.length < 5) {
       throw SearchException(
-        'customId must be at least 3 characters if provided',
+        'customId must be at least 5 characters if provided',
         code: 'INVALID_PARAMETER',
       );
     }

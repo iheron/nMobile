@@ -104,7 +104,7 @@ class ContactChatProfileScreenState extends BaseStateFulWidgetState<ContactChatP
       inputHint: Settings.locale((s) => s.input_custom_id, ctx: context),
       value: '',
       actionText: Settings.locale((s) => s.save, ctx: context),
-      minLength: 3,
+      minLength: 5,
       maxLength: 30,
       canTapClose: true,
       asyncValidator: (value) async {
