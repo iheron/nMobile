@@ -1,3 +1,4 @@
+import 'package:nmobile/common/db/db.dart';
 import 'package:nmobile/common/settings.dart';
 import 'package:nmobile/schema/wallet.dart';
 import 'package:nmobile/storages/settings.dart' as settings_storage;
@@ -43,6 +44,11 @@ class Upgrade {
             }
           }
         }
+      } else if (needRunStep(prevBuild: prev, currBuild: curr, targetBuild: 360)) {
+        logger.i("Upgrade - Running build 360 upgrade step");
+        logger.i("Upgrade - Previous build: $prev, Current build: $curr");
+        // Backup all unbacked databases before upgrade
+        await DB.backupAllUnbackedDatabases();
       }
      
     } finally {
