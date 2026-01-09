@@ -169,7 +169,6 @@ class ContactChatProfileScreenState extends BaseStateFulWidgetState<ContactChatP
 
       // Show success message
       Toast.show(Settings.locale((s) => s.success, ctx: context));
-
     } catch (e) {
       // Dismiss loading
       Loading.dismiss();
@@ -203,7 +202,7 @@ class ContactChatProfileScreenState extends BaseStateFulWidgetState<ContactChatP
             final hasCustomId = customIdState.customId != null && customIdState.customId!.isNotEmpty;
 
             // Display customId if available, otherwise display full address
-            final displayId = hasCustomId ? customIdState.customId! : this._contact.address;
+            final displayId = hasCustomId && this._contact.isMe ? customIdState.customId! : this._contact.address;
 
             return Column(
               children: <Widget>[
@@ -211,7 +210,7 @@ class ContactChatProfileScreenState extends BaseStateFulWidgetState<ContactChatP
                 TextButton(
                   style: _buttonStyle(topRadius: true, botRadius: false, topPad: 20, botPad: 10),
                   onPressed: () {
-                    _modifyCustomId();
+                    if (this._contact.isMe) _modifyCustomId();
                   },
                   child: Row(
                     children: <Widget>[
@@ -225,11 +224,13 @@ class ContactChatProfileScreenState extends BaseStateFulWidgetState<ContactChatP
                       ),
                       Spacer(),
 
-                      Icon(
-                        Icons.edit,
-                        color: application.theme.fontColor2,
-                        size: 18,
-                      ),
+                      this._contact.isMe
+                          ? Icon(
+                              Icons.edit,
+                              color: application.theme.fontColor2,
+                              size: 18,
+                            )
+                          : SizedBox.shrink(),
                     ],
                   ),
                 ),
