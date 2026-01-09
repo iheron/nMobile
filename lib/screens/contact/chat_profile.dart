@@ -163,9 +163,9 @@ class ContactChatProfileScreenState extends BaseStateFulWidgetState<ContactChatP
       // Dismiss loading
       Loading.dismiss();
 
-      // Update provider with new custom ID
+      // Update provider with new custom ID and associated nknAddress
       final container = ProviderScope.containerOf(context, listen: false);
-      container.read(customIdProvider.notifier).setCustomId(customId);
+      container.read(customIdProvider.notifier).setCustomId(customId, nknAddress);
 
       // Show success message
       Toast.show(Settings.locale((s) => s.success, ctx: context));
@@ -199,10 +199,13 @@ class ContactChatProfileScreenState extends BaseStateFulWidgetState<ContactChatP
         child: Consumer(
           builder: (context, ref, child) {
             final customIdState = ref.watch(customIdProvider);
-            final hasCustomId = customIdState.customId != null && customIdState.customId!.isNotEmpty;
+            
+            // Get customId for this contact's address
+            final customId = customIdState.getCustomId(this._contact.address);
+            final hasCustomId = customId != null && customId.isNotEmpty;
 
             // Display customId if available, otherwise display full address
-            final displayId = hasCustomId && this._contact.isMe ? customIdState.customId! : this._contact.address;
+            final displayId = hasCustomId ? customId! : this._contact.address;
 
             return Column(
               children: <Widget>[

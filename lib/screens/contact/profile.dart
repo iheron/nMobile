@@ -464,10 +464,12 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
 
   /// Get display text - show custom ID if available, otherwise show address
   String _getDisplayText(CustomIdState customIdState) {
-    // If it's the current user and has custom ID, show custom ID
-    // Use _contact?.isMe instead of comparing addresses to work when client is still connecting
-    if (_contact?.isMe == true && customIdState.customId != null && customIdState.customId!.isNotEmpty) {
-      return customIdState.customId!;
+    // If it's the current user, try to get custom ID by address
+    if (_contact?.isMe == true && _contact?.address != null) {
+      final customId = customIdState.getCustomId(_contact!.address);
+      if (customId != null && customId.isNotEmpty) {
+        return customId;
+      }
     }
     // Otherwise show address
     return _getClientAddressShow();
@@ -631,8 +633,9 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
                       builder: (context, ref, child) {
                         final customIdState = ref.watch(customIdProvider);
                         final displayText = _getDisplayText(customIdState);
-                        // Use _contact?.isMe instead of comparing addresses to work when client is still connecting
-                        final hasCustomId = _contact?.isMe == true && customIdState.customId != null && customIdState.customId!.isNotEmpty;
+                        // Check if customId exists for this contact's address
+                        final customId = _contact?.address != null ? customIdState.getCustomId(_contact!.address) : null;
+                        final hasCustomId = customId != null && customId.isNotEmpty;
 
                         return TextButton(
                           style: _buttonStyle(topRadius: true, botRadius: true, topPad: 12, botPad: 12),
@@ -651,8 +654,8 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
                                 color: application.theme.fontColor1,
                               ),
                               Spacer(),
-                              // Only show loading when there's no cached customId
-                              (customIdState.isLoading && customIdState.customId == null)
+                              // Only show loading when there's no cached customId for this address
+                              (customIdState.isLoading && customId == null)
                                   ? SizedBox(
                                       width: 16,
                                       height: 16,

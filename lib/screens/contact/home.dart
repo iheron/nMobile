@@ -1,16 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:nmobile/common/locator.dart';
 import 'package:nmobile/common/settings.dart';
 import 'package:nmobile/components/base/stateful.dart';
 import 'package:nmobile/components/button/button.dart';
 import 'package:nmobile/components/contact/item.dart';
+import 'package:nmobile/components/dialog/bottom.dart';
+import 'package:nmobile/components/dialog/create_private_group.dart';
 import 'package:nmobile/components/dialog/loading.dart';
 import 'package:nmobile/components/dialog/modal.dart';
+import 'package:nmobile/components/layout/chat_topic_search.dart';
 import 'package:nmobile/components/layout/header.dart';
 import 'package:nmobile/components/layout/layout.dart';
 import 'package:nmobile/components/private_group/item.dart';
@@ -18,22 +21,18 @@ import 'package:nmobile/components/text/fixed_text_field.dart';
 import 'package:nmobile/components/text/label.dart';
 import 'package:nmobile/components/tip/toast.dart';
 import 'package:nmobile/components/topic/item.dart';
-import 'package:nmobile/components/dialog/bottom.dart';
-import 'package:nmobile/components/dialog/create_private_group.dart';
-import 'package:nmobile/components/layout/chat_topic_search.dart';
 import 'package:nmobile/schema/contact.dart';
 import 'package:nmobile/schema/private_group.dart';
 import 'package:nmobile/schema/topic.dart';
 import 'package:nmobile/screens/chat/messages.dart';
 import 'package:nmobile/screens/contact/add.dart';
-import 'package:nmobile/screens/contact/home_empty.dart';
 import 'package:nmobile/screens/contact/profile.dart';
 import 'package:nmobile/utils/asset.dart';
-import 'package:nmobile/utils/util.dart';
+import 'package:nmobile/utils/contact_io.dart';
 import 'package:nmobile/utils/time.dart';
+import 'package:nmobile/utils/util.dart';
 
 import '../../helpers/error.dart';
-import 'package:nmobile/utils/contact_io.dart';
 
 class ContactHomeScreen extends BaseStateFulWidget {
   static const String routeName = '/contact/home';
@@ -68,10 +67,12 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
   bool _pageLoaded = false;
 
   StreamSubscription? _addContactSubscription;
+
   // StreamSubscription? _deleteContactSubscription;
   StreamSubscription? _updateContactSubscription;
 
   StreamSubscription? _addTopicSubscription;
+
   // StreamSubscription? _deleteTopicSubscription;
   StreamSubscription? _updateTopicSubscription;
 
@@ -81,11 +82,13 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
   TextEditingController _searchController = TextEditingController();
 
   List<ContactSchema> _allFriends = <ContactSchema>[];
+
   /*List<ContactSchema> _allStrangers = <ContactSchema>[];*/
   List<TopicSchema> _allTopics = <TopicSchema>[];
   List<PrivateGroupSchema> _allGroups = <PrivateGroupSchema>[];
 
   List<ContactSchema> _searchFriends = <ContactSchema>[];
+
   /*List<ContactSchema> _searchStrangers = <ContactSchema>[];*/
   List<TopicSchema> _searchTopics = <TopicSchema>[];
   List<PrivateGroupSchema> _searchGroups = <PrivateGroupSchema>[];
@@ -223,7 +226,11 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
     //   _searchAction(_searchController.text);
     // });
     _updateContactSubscription = topicCommon.updateStream.listen((TopicSchema event) {
-      _allTopics = _allTopics.map((e) => e.topicId == event.topicId ? event : e).toList();
+      if (_allTopics.indexWhere((element) => element.topicId == event.topicId) < 0) {
+        _allTopics.insert(0, event);
+        _searchAction(_searchController.text);
+        return;
+      }
       if (!event.joined) {
         _allTopics = _allTopics.where((element) => element.topicId != event.topicId).toList();
       }
@@ -360,9 +367,6 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
     /*int totalStrangerDataCount = _allStrangers.length;*/
 
     int totalDataCount = totalFriendDataCount + totalTopicDataCount + totalGroupDataCount; // + totalStrangerDataCount;
-    if (totalDataCount <= 0 && _pageLoaded) {
-      return ContactHomeEmptyLayout();
-    }
 
     int searchFriendDataCount = _searchFriends.length;
     int searchFriendViewCount = (searchFriendDataCount > 0 ? 1 : 0) + searchFriendDataCount;
@@ -426,103 +430,132 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
         },
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.only(left: 16, right: 16, top: 24, bottom: 12),
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
               child: Container(
-                decoration: BoxDecoration(
-                  color: application.theme.backgroundColor2,
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      width: 48,
-                      height: 48,
-                      alignment: Alignment.center,
-                      child: Asset.iconSvg(
-                        'search',
-                        color: application.theme.fontColor2,
+                padding: const EdgeInsets.only(left: 16, right: 16, top: 24, bottom: 12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: application.theme.backgroundColor2,
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        width: 48,
+                        height: 48,
+                        alignment: Alignment.center,
+                        child: Asset.iconSvg(
+                          'search',
+                          color: application.theme.fontColor2,
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: FixedTextField(
-                        controller: _searchController,
-                        onChanged: (val) {
-                          _searchAction(val);
-                        },
-                        style: TextStyle(fontSize: 14, height: 1.5),
-                        decoration: InputDecoration(
-                          hintText: Settings.locale((s) => s.search, ctx: context),
-                          contentPadding: const EdgeInsets.only(left: 0, right: 16, top: 9, bottom: 9),
-                          border: UnderlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(20)),
-                            borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+                      Expanded(
+                        child: FixedTextField(
+                          controller: _searchController,
+                          onChanged: (val) {
+                            _searchAction(val);
+                          },
+                          style: TextStyle(fontSize: 14, height: 1.5),
+                          decoration: InputDecoration(
+                            hintText: Settings.locale((s) => s.search, ctx: context),
+                            contentPadding: const EdgeInsets.only(left: 0, right: 16, top: 9, bottom: 9),
+                            border: UnderlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                              borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-            Expanded(
-              child: CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: _searchController.text.isNotEmpty ? _buildSearchByIdMenuBar() : _buildActionMenuBar(),
-                  ),
-                  SliverPadding(
-                    padding: EdgeInsets.only(bottom: 72),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          int friendItemIndex = index - 1;
-                          int topicItemIndex = index - searchFriendViewCount - 1;
-                          int groupItemIndex = index - searchTopicViewCount - searchFriendViewCount - 1;
-
-                          if (searchFriendViewCount > 0 && index >= friendStartIndex && index <= friendEndIndex) {
-                            if (index == friendStartIndex) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 12, bottom: 16, left: 16, right: 16),
-                                child: Label(
-                                  '($searchFriendDataCount) ${Settings.locale((s) => s.friends, ctx: context)}',
-                                  type: LabelType.h3,
-                                ),
-                              );
-                            }
-                            return _getFriendItemView(_searchFriends[friendItemIndex]);
-                          } else if (searchTopicViewCount > 0 && index >= topicStartIndex && index <= topicEndIndex) {
-                            if (index == topicStartIndex) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 24, bottom: 16, left: 16, right: 16),
-                                child: Label(
-                                  '($searchTopicDataCount) ${Settings.locale((s) => s.group_chat, ctx: context)}',
-                                  type: LabelType.h3,
-                                ),
-                              );
-                            }
-                            return _getTopicItemView(_searchTopics[topicItemIndex]);
-                          } else if (searchGroupViewCount > 0 && index >= groupStartIndex && index <= groupEndIndex) {
-                            if (index == groupStartIndex) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 24, bottom: 16, left: 16, right: 16),
-                                child: Label(
-                                  '($searchGroupDataCount) ${Settings.locale((s) => s.group_chat, ctx: context)}',
-                                  type: LabelType.h3,
-                                ),
-                              );
-                            }
-                            return _getGroupItemView(_searchGroups[groupItemIndex]);
-                          }
-                          return SizedBox.shrink();
-                        },
-                        childCount: listItemViewCount,
+            SliverToBoxAdapter(
+              child: _searchController.text.isNotEmpty ? _buildSearchByIdMenuBar() : _buildActionMenuBar(),
+            ),
+            totalDataCount <= 0 && _pageLoaded
+                ? SliverPadding(
+                    padding: EdgeInsets.only(top: 40),
+                    sliver: SliverToBoxAdapter(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Asset.image("contact/no-contact.png", width: 200, height: 200),
+                          SizedBox(height: 30),
+                          Column(
+                            children: <Widget>[
+                              Label(
+                                Settings.locale((s) => s.contact_no_contact_title, ctx: context),
+                                type: LabelType.h2,
+                                textAlign: TextAlign.center,
+                                maxLines: 10,
+                              ),
+                              SizedBox(height: 50),
+                              Label(
+                                Settings.locale((s) => s.contact_no_contact_desc, ctx: context),
+                                type: LabelType.bodySmall,
+                                textAlign: TextAlign.center,
+                                softWrap: true,
+                                maxLines: 10,
+                              )
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
+                  )
+                : SliverToBoxAdapter(),
+            SliverPadding(
+              padding: EdgeInsets.only(bottom: 72),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    int friendItemIndex = index - 1;
+                    int topicItemIndex = index - searchFriendViewCount - 1;
+                    int groupItemIndex = index - searchTopicViewCount - searchFriendViewCount - 1;
+
+                    if (searchFriendViewCount > 0 && index >= friendStartIndex && index <= friendEndIndex) {
+                      if (index == friendStartIndex) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 12, bottom: 16, left: 16, right: 16),
+                          child: Label(
+                            '($searchFriendDataCount) ${Settings.locale((s) => s.friends, ctx: context)}',
+                            type: LabelType.h3,
+                          ),
+                        );
+                      }
+                      return _getFriendItemView(_searchFriends[friendItemIndex]);
+                    } else if (searchTopicViewCount > 0 && index >= topicStartIndex && index <= topicEndIndex) {
+                      if (index == topicStartIndex) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 24, bottom: 16, left: 16, right: 16),
+                          child: Label(
+                            '($searchTopicDataCount) ${Settings.locale((s) => s.group_chat, ctx: context)}',
+                            type: LabelType.h3,
+                          ),
+                        );
+                      }
+                      return _getTopicItemView(_searchTopics[topicItemIndex]);
+                    } else if (searchGroupViewCount > 0 && index >= groupStartIndex && index <= groupEndIndex) {
+                      if (index == groupStartIndex) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 24, bottom: 16, left: 16, right: 16),
+                          child: Label(
+                            '($searchGroupDataCount) ${Settings.locale((s) => s.group_chat, ctx: context)}',
+                            type: LabelType.h3,
+                          ),
+                        );
+                      }
+                      return _getGroupItemView(_searchGroups[groupItemIndex]);
+                    }
+                    return SizedBox.shrink();
+                  },
+                  childCount: listItemViewCount,
+                ),
               ),
             ),
           ],
@@ -562,7 +595,7 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
         extentRatio: 0.25,
         children: [
           CustomSlidableAction(
-            onPressed: (BuildContext context)  {
+            onPressed: (BuildContext context) {
               ModalDialog.of(Settings.appContext).confirm(
                 title: Settings.locale((s) => s.delete_contact_confirm_title, ctx: context),
                 contentWidget: ContactItem(
@@ -597,7 +630,11 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(Icons.delete, color: application.theme.fontLightColor, size: 24,),
+                Icon(
+                  Icons.delete,
+                  color: application.theme.fontLightColor,
+                  size: 24,
+                ),
                 Label(
                   Settings.locale((s) => s.delete, ctx: context),
                   color: application.theme.fontLightColor,
@@ -681,7 +718,11 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(Icons.delete, color: application.theme.fontLightColor, size: 24,),
+                Icon(
+                  Icons.delete,
+                  color: application.theme.fontLightColor,
+                  size: 24,
+                ),
                 Label(
                   Settings.locale((s) => s.delete, ctx: context),
                   color: application.theme.fontLightColor,
@@ -761,7 +802,11 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(Icons.delete, color: application.theme.fontLightColor, size: 24,),
+                Icon(
+                  Icons.delete,
+                  color: application.theme.fontLightColor,
+                  size: 24,
+                ),
                 Label(
                   Settings.locale((s) => s.delete, ctx: context),
                   color: application.theme.fontLightColor,

@@ -4,27 +4,53 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../common/search_service/search_service.dart';
 
 /// Custom ID state model
+/// Stores multiple customIds mapped by nknAddress
 class CustomIdState {
-  final String? customId;
+  // Map of nknAddress -> customId
+  final Map<String, String?> customIdMap;
   final bool isLoading;
   final String? error;
 
   const CustomIdState({
-    this.customId,
+    Map<String, String?>? customIdMap,
     this.isLoading = false,
     this.error,
-  });
+  }) : customIdMap = customIdMap ?? const {};
 
   CustomIdState copyWith({
-    String? customId,
+    Map<String, String?>? customIdMap,
     bool? isLoading,
     String? error,
   }) {
     return CustomIdState(
-      customId: customId ?? this.customId,
+      customIdMap: customIdMap ?? this.customIdMap,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
     );
+  }
+
+  /// Get customId for a given nknAddress
+  /// Returns null if not found
+  String? getCustomId(String? nknAddress) {
+    if (nknAddress == null || nknAddress.isEmpty) return null;
+    
+    // Try exact match first
+    if (customIdMap.containsKey(nknAddress)) {
+      return customIdMap[nknAddress];
+    }
+    
+    // Try matching by publickey (handle "identifier.publickey" format)
+    final publicKey = nknAddress.contains('.') ? nknAddress.split('.').last : nknAddress;
+    
+    // Check all keys for matching publickey
+    for (final key in customIdMap.keys) {
+      final keyPublicKey = key.contains('.') ? key.split('.').last : key;
+      if (keyPublicKey == publicKey) {
+        return customIdMap[key];
+      }
+    }
+    
+    return null;
   }
 }
 
@@ -53,24 +79,27 @@ class CustomIdNotifier extends Notifier<CustomIdState> {
       // Dispose the service
       await service.dispose();
 
+      // Update the map with the new customId for this nknAddress
+      final updatedMap = Map<String, String?>.from(state.customIdMap);
+      updatedMap[nknAddress] = myInfo?.customId;
+
       if (myInfo == null) {
         // No data found - user hasn't submitted custom ID yet (not an error)
         state = state.copyWith(
-          customId: null,
+          customIdMap: updatedMap,
           isLoading: false,
           error: null,
         );
       } else {
-        // Update state with custom ID (can be null if not set)
+        // Update state with custom ID (can be null if not set) and associated nknAddress
         state = state.copyWith(
-          customId: myInfo.customId,
+          customIdMap: updatedMap,
           isLoading: false,
           error: null,
         );
       }
     } catch (e) {
       state = state.copyWith(
-        customId: null,
         isLoading: false,
         error: e.toString(),
       );
@@ -78,11 +107,27 @@ class CustomIdNotifier extends Notifier<CustomIdState> {
   }
 
   /// Update custom ID (after user submits)
-  void setCustomId(String? customId) {
-    state = state.copyWith(customId: customId);
+  /// Parameters:
+  /// - customId: The custom ID to set
+  /// - nknAddress: The NKN address associated with this customId
+  void setCustomId(String? customId, String? nknAddress) {
+    if (nknAddress?.isNotEmpty != true) return;
+    
+    final updatedMap = Map<String, String?>.from(state.customIdMap);
+    updatedMap[nknAddress!] = customId;
+    state = state.copyWith(customIdMap: updatedMap);
   }
 
-  /// Clear custom ID
+  /// Clear custom ID for a specific address
+  void clearCustomId(String? nknAddress) {
+    if (nknAddress == null || nknAddress.isEmpty) return;
+    
+    final updatedMap = Map<String, String?>.from(state.customIdMap);
+    updatedMap.remove(nknAddress);
+    state = state.copyWith(customIdMap: updatedMap);
+  }
+
+  /// Clear all custom IDs
   void clear() {
     state = const CustomIdState();
   }
