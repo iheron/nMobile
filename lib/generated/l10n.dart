@@ -4110,6 +4110,66 @@ class S {
     );
   }
 
+  /// `File Manager`
+  String get file_manager {
+    return Intl.message(
+      'File Manager',
+      name: 'file_manager',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to delete "{name}"?`
+  String delete_file_confirm_title(Object name) {
+    return Intl.message(
+      'Are you sure you want to delete "$name"?',
+      name: 'delete_file_confirm_title',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Total`
+  String get total {
+    return Intl.message(
+      'Total',
+      name: 'total',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No files found`
+  String get no_files_found {
+    return Intl.message(
+      'No files found',
+      name: 'no_files_found',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Error loading files: {error}`
+  String error_loading_files(Object error) {
+    return Intl.message(
+      'Error loading files: $error',
+      name: 'error_loading_files',
+      desc: '',
+      args: [error],
+    );
+  }
+
+  /// `Error deleting file: {error}`
+  String error_deleting_file(Object error) {
+    return Intl.message(
+      'Error deleting file: $error',
+      name: 'error_deleting_file',
+      desc: '',
+      args: [error],
+    );
+  }
+
   /// `Block`
   String get block {
     return Intl.message(

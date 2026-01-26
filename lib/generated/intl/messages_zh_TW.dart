@@ -22,17 +22,23 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m0(time) => "該對話接收和發送的消息將於 ${time} 後消失。";
 
-  static String m1(field) => "${field} 必填";
+  static String m1(name) => "您確定要刪除 \"${name}\" 嗎？";
 
-  static String m2(limit) => "一次最多上傳${limit}張圖片";
+  static String m2(error) => "刪除檔案錯誤：${error}";
 
-  static String m3(other) => "${other} 邀請您加入群聊";
+  static String m3(field) => "${field} 必填";
 
-  static String m4(other) => "您邀請 ${other} 加入群聊";
+  static String m4(error) => "載入檔案錯誤：${error}";
 
-  static String m5(other) => "${other}已接受邀請";
+  static String m5(limit) => "一次最多上傳${limit}張圖片";
 
-  static String m6(length) => "請至少輸入 ${length} 個字符。";
+  static String m6(other) => "${other} 邀請您加入群聊";
+
+  static String m7(other) => "您邀請 ${other} 加入群聊";
+
+  static String m8(other) => "${other}已接受邀請";
+
+  static String m9(length) => "請至少輸入 ${length} 個字符。";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -178,6 +184,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("您確定要清空資料庫嗎？"),
         "delete_device_confirm_title":
             MessageLookupByLibrary.simpleMessage("您確定要刪除該設備嗎？"),
+        "delete_file_confirm_title": m1,
         "delete_friend_confirm_title":
             MessageLookupByLibrary.simpleMessage("您確定要刪除該好友嗎？"),
         "delete_mapping_address_confirm_title":
@@ -192,7 +199,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "這將從您的設備中刪除帳戶。請確保您的帳戶已備份，否則您的資金將丟失且無法找回。"),
         "delete_wallet_confirm_title":
             MessageLookupByLibrary.simpleMessage("您確定要刪除此帳戶嗎?"),
-        "developer_options": MessageLookupByLibrary.simpleMessage("开发人员选项"),
+        "developer_options": MessageLookupByLibrary.simpleMessage("開發人員選項"),
         "disconnect": MessageLookupByLibrary.simpleMessage("斷開連接"),
         "do_not_allow_push_message_notifications_to_others":
             MessageLookupByLibrary.simpleMessage("不允許推送消息通知給其他人"),
@@ -217,9 +224,11 @@ class MessageLookup extends MessageLookupByLibrary {
         "error_client_address_format":
             MessageLookupByLibrary.simpleMessage("地址不正確"),
         "error_confirm_password": MessageLookupByLibrary.simpleMessage("密碼不匹配"),
-        "error_field_required": m1,
+        "error_deleting_file": m2,
+        "error_field_required": m3,
         "error_keystore_format":
             MessageLookupByLibrary.simpleMessage("Keystore 錯誤"),
+        "error_loading_files": m4,
         "error_nkn_address_format":
             MessageLookupByLibrary.simpleMessage("賬戶地址無效"),
         "error_required": MessageLookupByLibrary.simpleMessage("必填"),
@@ -242,9 +251,10 @@ class MessageLookup extends MessageLookupByLibrary {
         "fast": MessageLookupByLibrary.simpleMessage("快"),
         "featured": MessageLookupByLibrary.simpleMessage("精選"),
         "fee": MessageLookupByLibrary.simpleMessage("礦工費"),
+        "file_manager": MessageLookupByLibrary.simpleMessage("檔案管理"),
         "file_not_exist": MessageLookupByLibrary.simpleMessage("文件不存在"),
         "file_too_big": MessageLookupByLibrary.simpleMessage("文件尺寸過大"),
-        "file_too_many": m2,
+        "file_too_many": m5,
         "files": MessageLookupByLibrary.simpleMessage("文件"),
         "first_name": MessageLookupByLibrary.simpleMessage("名"),
         "friends": MessageLookupByLibrary.simpleMessage("好友"),
@@ -307,8 +317,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("你已經邀請過該成員，繼續邀請?"),
         "invitee_already_exists":
             MessageLookupByLibrary.simpleMessage("收邀人已存在"),
-        "invites_desc_me": m3,
-        "invites_desc_other": m4,
+        "invites_desc_me": m6,
+        "invites_desc_other": m7,
         "inviting": MessageLookupByLibrary.simpleMessage("邀請中"),
         "join_but_not_invite": MessageLookupByLibrary.simpleMessage("未邀請"),
         "joined_channel": MessageLookupByLibrary.simpleMessage("加入群聊"),
@@ -349,7 +359,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "menu_news": MessageLookupByLibrary.simpleMessage("新聞"),
         "menu_settings": MessageLookupByLibrary.simpleMessage("設置"),
         "menu_wallet": MessageLookupByLibrary.simpleMessage("帳戶"),
-        "message_debug_info": MessageLookupByLibrary.simpleMessage("消息调试信息"),
+        "message_debug_info": MessageLookupByLibrary.simpleMessage("消息調試信息"),
         "min": MessageLookupByLibrary.simpleMessage("最小"),
         "minutes": MessageLookupByLibrary.simpleMessage("分鐘"),
         "my_contact": MessageLookupByLibrary.simpleMessage("我的聯繫人"),
@@ -371,6 +381,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "nkn": MessageLookupByLibrary.simpleMessage("NKN"),
         "nkn_mainnet": MessageLookupByLibrary.simpleMessage("NKN 主網"),
         "no": MessageLookupByLibrary.simpleMessage("不"),
+        "no_files_found": MessageLookupByLibrary.simpleMessage("未找到檔案"),
         "no_permission_action": MessageLookupByLibrary.simpleMessage("無權進行此操作"),
         "no_permission_join_group":
             MessageLookupByLibrary.simpleMessage("還未獲得入群權限，請稍後再試。"),
@@ -393,7 +404,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "only_owner_can_modify":
             MessageLookupByLibrary.simpleMessage("僅群主可修改此項"),
         "optional": MessageLookupByLibrary.simpleMessage("可選"),
-        "other_accepted_already": m5,
+        "other_accepted_already": m8,
         "owner": MessageLookupByLibrary.simpleMessage("群主"),
         "password_wrong":
             MessageLookupByLibrary.simpleMessage("賬戶密碼或keystore錯誤"),
@@ -494,7 +505,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("自訂ID只能包含字母、數字或底線"),
         "tip_custom_id_taken":
             MessageLookupByLibrary.simpleMessage("此自訂ID已被其他用戶佔用"),
-        "tip_input_min_length": m6,
+        "tip_input_min_length": m9,
         "tip_open_send_device_token":
             MessageLookupByLibrary.simpleMessage("是否開啟來自對方的消息通知提醒?"),
         "tip_password_error": MessageLookupByLibrary.simpleMessage("密碼錯誤"),
@@ -518,6 +529,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "topic_resubscribe_enable":
             MessageLookupByLibrary.simpleMessage("公有群續訂"),
         "topic_subscribe_enable": MessageLookupByLibrary.simpleMessage("公有群訂閱"),
+        "total": MessageLookupByLibrary.simpleMessage("總計"),
         "total_balance": MessageLookupByLibrary.simpleMessage("余額"),
         "touch_id": MessageLookupByLibrary.simpleMessage("Touch ID"),
         "tracker": MessageLookupByLibrary.simpleMessage("跟踪器"),

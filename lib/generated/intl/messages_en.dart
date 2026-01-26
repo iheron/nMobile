@@ -23,17 +23,23 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m0(time) =>
       "Messages sent and received in this conversation will disappear ${time} after they have been seen.";
 
-  static String m1(field) => "${field} is required.";
+  static String m1(name) => "Are you sure you want to delete \"${name}\"?";
 
-  static String m2(limit) => "Upload up to ${limit} images at a time";
+  static String m2(error) => "Error deleting file: ${error}";
 
-  static String m3(other) => "${other} invites You to join group";
+  static String m3(field) => "${field} is required.";
 
-  static String m4(other) => "You invites ${other} to join group";
+  static String m4(error) => "Error loading files: ${error}";
 
-  static String m5(other) => "${other} have already accepted";
+  static String m5(limit) => "Upload up to ${limit} images at a time";
 
-  static String m6(length) => "Please enter at least ${length} characters.";
+  static String m6(other) => "${other} invites You to join group";
+
+  static String m7(other) => "You invites ${other} to join group";
+
+  static String m8(other) => "${other} have already accepted";
+
+  static String m9(length) => "Please enter at least ${length} characters.";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -210,6 +216,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Are you sure you want to clear the database?"),
         "delete_device_confirm_title": MessageLookupByLibrary.simpleMessage(
             "Are you sure you want to delete this device?"),
+        "delete_file_confirm_title": m1,
         "delete_friend_confirm_title": MessageLookupByLibrary.simpleMessage(
             "Are you sure you want to delete this friend?"),
         "delete_mapping_address_confirm_title":
@@ -259,9 +266,11 @@ class MessageLookup extends MessageLookupByLibrary {
             "Client address format does not match."),
         "error_confirm_password":
             MessageLookupByLibrary.simpleMessage("Password does not match."),
-        "error_field_required": m1,
+        "error_deleting_file": m2,
+        "error_field_required": m3,
         "error_keystore_format": MessageLookupByLibrary.simpleMessage(
             "Keystore format does not match."),
+        "error_loading_files": m4,
         "error_nkn_address_format":
             MessageLookupByLibrary.simpleMessage("Invalid wallet address."),
         "error_required":
@@ -288,11 +297,12 @@ class MessageLookup extends MessageLookupByLibrary {
         "fast": MessageLookupByLibrary.simpleMessage("Fast"),
         "featured": MessageLookupByLibrary.simpleMessage("Featured"),
         "fee": MessageLookupByLibrary.simpleMessage("Fee"),
+        "file_manager": MessageLookupByLibrary.simpleMessage("File Manager"),
         "file_not_exist":
             MessageLookupByLibrary.simpleMessage("The file does not exist"),
         "file_too_big":
             MessageLookupByLibrary.simpleMessage("The file is too big"),
-        "file_too_many": m2,
+        "file_too_many": m5,
         "files": MessageLookupByLibrary.simpleMessage("Files"),
         "first_name": MessageLookupByLibrary.simpleMessage("First Name"),
         "friends": MessageLookupByLibrary.simpleMessage("Friend"),
@@ -372,8 +382,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "You have already invited this member,still invite?"),
         "invitee_already_exists":
             MessageLookupByLibrary.simpleMessage("Invitee already exists"),
-        "invites_desc_me": m3,
-        "invites_desc_other": m4,
+        "invites_desc_me": m6,
+        "invites_desc_other": m7,
         "inviting": MessageLookupByLibrary.simpleMessage("inviting"),
         "join_but_not_invite":
             MessageLookupByLibrary.simpleMessage("not invited"),
@@ -446,6 +456,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "nkn": MessageLookupByLibrary.simpleMessage("NKN"),
         "nkn_mainnet": MessageLookupByLibrary.simpleMessage("NKN Mainnet"),
         "no": MessageLookupByLibrary.simpleMessage("No"),
+        "no_files_found":
+            MessageLookupByLibrary.simpleMessage("No files found"),
         "no_permission_action": MessageLookupByLibrary.simpleMessage(
             "Not authorized to perform this operation"),
         "no_permission_join_group": MessageLookupByLibrary.simpleMessage(
@@ -476,7 +488,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "only_owner_can_modify": MessageLookupByLibrary.simpleMessage(
             "Only the group owner can modify this item"),
         "optional": MessageLookupByLibrary.simpleMessage("optional"),
-        "other_accepted_already": m5,
+        "other_accepted_already": m8,
         "owner": MessageLookupByLibrary.simpleMessage("Owner"),
         "password_wrong": MessageLookupByLibrary.simpleMessage(
             "Account password or keystore file is wrong."),
@@ -587,7 +599,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Custom ID can only contain letters, numbers, or underscores"),
         "tip_custom_id_taken": MessageLookupByLibrary.simpleMessage(
             "This custom ID is already taken by another user"),
-        "tip_input_min_length": m6,
+        "tip_input_min_length": m9,
         "tip_open_send_device_token": MessageLookupByLibrary.simpleMessage(
             "Whether to open the notification reminder from the other party?"),
         "tip_password_error":
@@ -615,6 +627,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Public group renewal"),
         "topic_subscribe_enable":
             MessageLookupByLibrary.simpleMessage("Public group subscription"),
+        "total": MessageLookupByLibrary.simpleMessage("Total"),
         "total_balance": MessageLookupByLibrary.simpleMessage("TOTAL BALANCE"),
         "touch_id": MessageLookupByLibrary.simpleMessage("Touch ID"),
         "tracker": MessageLookupByLibrary.simpleMessage("Tracker"),

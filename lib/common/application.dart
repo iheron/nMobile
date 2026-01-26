@@ -9,6 +9,7 @@ import 'package:nmobile/utils/logger.dart';
 typedef Func = Future Function();
 
 class Application {
+  static const env = String.fromEnvironment("APP_ENV", defaultValue: "production");
   List<Func> _initializeFutures = <Func>[];
   List<Func> _mountedFutures = <Func>[];
 
@@ -33,6 +34,10 @@ class Application {
   int goBackgroundAt = 0;
   int goForegroundAt = 0;
 
+
+  bool get isDev => env == "development";
+  bool get isProd => env == "production";
+  
   Application();
 
   void init() {
