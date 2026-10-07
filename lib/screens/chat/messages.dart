@@ -20,6 +20,7 @@ import 'package:nmobile/components/text/label.dart';
 import 'package:nmobile/components/tip/toast.dart';
 import 'package:nmobile/components/topic/header.dart';
 import 'package:nmobile/helpers/file.dart';
+import 'package:nmobile/helpers/file_crypto.dart';
 import 'package:nmobile/schema/contact.dart';
 import 'package:nmobile/schema/device_info.dart';
 import 'package:nmobile/schema/message.dart';
@@ -131,6 +132,7 @@ class _ChatMessagesScreenState extends BaseStateFulWidgetState<ChatMessagesScree
   @override
   void initState() {
     super.initState();
+    FileCrypto.clearTempSync();
     messageCommon.chattingTargetId = this._targetId;
     _moreLoading = false;
 
@@ -144,10 +146,11 @@ class _ChatMessagesScreenState extends BaseStateFulWidgetState<ChatMessagesScree
     });
 
     // appLife
-    _appLifeChangeSubscription = application.appLifeStream.listen((bool inBackground) {
+    _appLifeChangeSubscription = application.appLifeStream.listen((bool inBackground) async {
       if (inBackground) {
-        audioHelper.playerRelease(); // await
-        audioHelper.recordRelease(); // await
+        await audioHelper.playerRelease();
+        await audioHelper.recordRelease();
+        await FileCrypto.releasePlayback();
       } else {
         int gap = application.goForegroundAt - application.goBackgroundAt;
         if (gap >= Settings.gapClientReAuthMs) {
@@ -314,6 +317,7 @@ class _ChatMessagesScreenState extends BaseStateFulWidgetState<ChatMessagesScree
 
     audioHelper.playerRelease(); // await
     audioHelper.recordRelease(); // await
+    FileCrypto.clearTempSync();
 
     _onInputChangeController.close();
     _clientStatusSubscription?.cancel();

@@ -26,6 +26,7 @@ import 'package:nmobile/components/text/label.dart';
 import 'package:nmobile/components/tip/toast.dart';
 import 'package:nmobile/helpers/error.dart';
 import 'package:nmobile/helpers/file.dart';
+import 'package:nmobile/helpers/file_crypto.dart';
 import 'package:nmobile/helpers/media_picker.dart';
 import 'package:nmobile/schema/contact.dart';
 import 'package:nmobile/schema/device_info.dart';
@@ -355,6 +356,7 @@ class _ContactProfileScreenState extends BaseStateFulWidgetState<ContactProfileS
       remarkAvatarLocalPath = Path.convert2Local(remarkAvatarPath);
     }
     if (remarkAvatarPath.isEmpty || remarkAvatarLocalPath == null || remarkAvatarLocalPath.isEmpty) return;
+    await FileCrypto.encryptInPlace(remarkAvatarPath);
 
     if (_contact?.type == ContactType.me) {
       contactCommon.setSelfAvatar(_contact?.address, remarkAvatarLocalPath, notify: true); // await

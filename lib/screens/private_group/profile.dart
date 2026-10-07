@@ -18,6 +18,7 @@ import 'package:nmobile/components/private_group/avatar_editable.dart';
 import 'package:nmobile/components/text/label.dart';
 import 'package:nmobile/components/tip/toast.dart';
 import 'package:nmobile/helpers/file.dart';
+import 'package:nmobile/helpers/file_crypto.dart';
 import 'package:nmobile/helpers/media_picker.dart';
 import 'package:nmobile/schema/private_group.dart';
 import 'package:nmobile/schema/private_group_item.dart';
@@ -191,6 +192,7 @@ class _PrivateGroupProfileScreenState extends BaseStateFulWidgetState<PrivateGro
       remarkAvatarPath = picked.path;
       remarkAvatarLocalPath = Path.convert2Local(remarkAvatarPath);
     }
+    await FileCrypto.encryptInPlace(remarkAvatarPath);
 
     privateGroupCommon.setAvatar(_privateGroup?.groupId, remarkAvatarLocalPath, notify: true); // await
   }

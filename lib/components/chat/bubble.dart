@@ -16,6 +16,7 @@ import 'package:nmobile/components/dialog/modal.dart';
 import 'package:nmobile/components/text/label.dart';
 import 'package:nmobile/components/text/markdown.dart';
 import 'package:nmobile/helpers/error.dart';
+import 'package:nmobile/helpers/file_crypto.dart';
 import 'package:nmobile/schema/message.dart';
 import 'package:nmobile/screens/common/media.dart';
 import 'package:nmobile/utils/format.dart';
@@ -58,6 +59,13 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
   double _fetchProgress = -1;
   double _playProgress = -1;
   String? _thumbnailPath;
+  String? _plainThumb;
+  String? _plainContent;
+  String? _heldThumb;
+  String? _heldContent;
+  int _bindGen = 0;
+  int _plainEpoch = 0;
+  bool _rebindScheduled = false;
   Offset _menuAlignmentOffset = Offset.zero;
 
   @override
@@ -70,6 +78,7 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
     _refreshProgress();
     // thumbnail
     _refreshMediaThumbnail();
+    _bindPlainFiles();
   }
 
   @override
@@ -128,7 +137,142 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
     _onProgressStreamSubscription?.cancel();
     _onPlayProgressSubscription?.cancel();
     _message.temp?["mediaPlayProgress"] = 0; // need init
+    final thumb = _heldThumb;
+    final content = _heldContent;
+    _heldThumb = null;
+    _heldContent = null;
+    _bindGen++;
+    FileCrypto.release(thumb);
+    FileCrypto.release(content);
     super.dispose();
+  }
+
+  void _bindPlainFiles() {
+    _plainEpoch = FileCrypto.epoch;
+    final gen = ++_bindGen;
+    _bindPlainFilesAsync(gen);
+  }
+
+  Future<void> _bindPlainFilesAsync(int gen) async {
+    final thumb = _thumbnailPath;
+    String? content;
+    if ((thumb == null || thumb.isEmpty) && _message.isContentFile) {
+      String contentType = _message.contentType;
+      if (contentType == MessageContentType.ipfs) {
+        int? type = MessageOptions.getFileType(_message.options);
+        if (type == MessageOptions.fileTypeImage) contentType = MessageContentType.image;
+      }
+      if (contentType == MessageContentType.image) {
+        content = (_message.content as File).path;
+      }
+    }
+    if (gen != _bindGen) return;
+    await _swapHold(isThumb: true, path: thumb, gen: gen);
+    if (gen != _bindGen) return;
+    await _swapHold(isThumb: false, path: content, gen: gen);
+  }
+
+  Future<void> _swapHold({required bool isThumb, String? path, required int gen}) async {
+    final held = isThumb ? _heldThumb : _heldContent;
+    final plain = isThumb ? _plainThumb : _plainContent;
+    if ((path == null || path.isEmpty) && (held == null || held.isEmpty)) return;
+    final encrypted = (path != null && path.isNotEmpty) ? FileCrypto.isEncryptedSync(path) : false;
+    final ready = path == held && plain != null && plain.isNotEmpty && File(plain).existsSync() && (!encrypted || plain != path);
+    if (ready) return;
+
+    if (held != null) {
+      await FileCrypto.release(held);
+      if (gen != _bindGen || !mounted) return;
+    }
+    if (isThumb) {
+      _heldThumb = null;
+      _plainThumb = null;
+    } else {
+      _heldContent = null;
+      _plainContent = null;
+    }
+
+    if (path == null || path.isEmpty) {
+      if (mounted && gen == _bindGen) setState(() {});
+      return;
+    }
+
+    String? opened;
+    if (!encrypted) {
+      opened = path;
+    } else {
+      try {
+        opened = await FileCrypto.openForRead(path);
+      } catch (e, st) {
+        handleError(e, st);
+        return;
+      }
+      if (opened == null || opened.isEmpty || gen != _bindGen || !mounted) {
+        await FileCrypto.release(path);
+        return;
+      }
+    }
+    if (opened.isEmpty || !mounted || gen != _bindGen) return;
+    setState(() {
+      if (isThumb) {
+        _heldThumb = path;
+        _plainThumb = opened;
+      } else {
+        _heldContent = path;
+        _plainContent = opened;
+      }
+    });
+  }
+
+  void _scheduleRebindIfWiped() {
+    if (FileCrypto.epoch == _plainEpoch || _rebindScheduled) return;
+    _rebindScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _rebindScheduled = false;
+      if (!mounted) return;
+      if (FileCrypto.epoch == _plainEpoch) return;
+      _plainEpoch = FileCrypto.epoch;
+      _heldThumb = null;
+      _heldContent = null;
+      _plainThumb = null;
+      _plainContent = null;
+      _bindPlainFiles();
+    });
+  }
+
+  void _recoverPlain() {
+    if (_rebindScheduled) return;
+    _rebindScheduled = true;
+    Future.microtask(() async {
+      _rebindScheduled = false;
+      if (!mounted) return;
+      final thumb = _heldThumb;
+      final content = _heldContent;
+      _heldThumb = null;
+      _heldContent = null;
+      _plainThumb = null;
+      _plainContent = null;
+      await FileCrypto.release(thumb);
+      await FileCrypto.release(content);
+      if (!mounted) return;
+      _bindPlainFiles();
+    });
+  }
+
+  Widget _fileImage(String? plainPath, int? cacheWidth, int? cacheHeight, double placeholderWidth, double placeholderHeight) {
+    if (plainPath == null || plainPath.isEmpty || !File(plainPath).existsSync()) {
+      return SizedBox(width: placeholderWidth, height: placeholderHeight);
+    }
+    return Image.file(
+      File(plainPath),
+      fit: BoxFit.cover,
+      cacheWidth: cacheWidth,
+      cacheHeight: cacheHeight,
+      errorBuilder: (context, error, stack) {
+        _recoverPlain();
+        return SizedBox(width: placeholderWidth, height: placeholderHeight);
+      },
+    );
   }
 
   void _refreshProgress() {
@@ -194,6 +338,7 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
       ],
     );
 
+    _scheduleRebindIfWiped();
     if (Settings.messageDebugInfo) {
       return Column(children: [widget, _widgetMessageDebugInfo()]);
     }
@@ -354,8 +499,32 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
           double? durationS = MessageOptions.getMediaDuration(_message.options);
           int? durationMs = (durationS == null) ? null : ((durationS * 1000).round());
           File file = _message.content as File;
-          onTap = () {
-            audioHelper.playStart(_message.msgId, file.path, durationMs: durationMs);
+          onTap = () async {
+            final stored = file.path;
+            final playingThis = audioHelper.playerId == _message.msgId && !audioHelper.player.isStopped;
+            if (playingThis) {
+              await audioHelper.playStop();
+              await FileCrypto.playbackFinished(stored);
+              return;
+            }
+            final plain = await FileCrypto.openForRead(stored);
+            if (plain == null || plain.isEmpty) return;
+            final prev = FileCrypto.playbackStored;
+            FileCrypto.playbackStored = stored;
+            final started = await audioHelper.playStart(
+              _message.msgId,
+              plain,
+              durationMs: durationMs,
+              onFinished: () {
+                FileCrypto.playbackFinished(stored);
+              },
+            );
+            if (prev != null && prev != stored) {
+              await FileCrypto.release(prev);
+            }
+            if (!started || audioHelper.playerId != _message.msgId) {
+              await FileCrypto.playbackFinished(stored);
+            }
           };
         }
         break;
@@ -387,9 +556,11 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
         bool fileDownloaded = (_message.contentType == MessageContentType.ipfs) && (state == MessageOptions.ipfsStateYes);
         if (_message.isContentFile && (fileNative || fileDownloaded)) {
           File file = _message.content as File;
-          onTap = () {
+          onTap = () async {
+            final plain = await FileCrypto.openForRead(file.path);
+            if (plain == null || plain.isEmpty) return;
             try {
-              OpenFilex.open(file.path);
+              await OpenFilex.open(plain);
             } catch (e, st) {
               handleError(e, st);
             }
@@ -778,24 +949,13 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
     Widget child;
     Color? color;
     if (_thumbnailPath != null) {
-      child = Image.file(
-        File(_thumbnailPath!),
-        fit: BoxFit.cover,
-        cacheWidth: ratioWH[0]?.toInt(),
-        cacheHeight: ratioWH[1]?.toInt(),
-      );
+      child = _fileImage(_plainThumb, ratioWH[0]?.toInt(), ratioWH[1]?.toInt(), placeholderWidth, placeholderHeight);
       color = Colors.black;
     } else {
       if ((_message.isOutbound == false) && (_message.contentType == MessageContentType.ipfs)) {
         int state = MessageOptions.getIpfsState(_message.options);
         if ((state == MessageOptions.ipfsStateYes) && _message.isContentFile) {
-          File file = _message.content as File;
-          child = Image.file(
-            file,
-            fit: BoxFit.cover,
-            cacheWidth: ratioWH[0]?.toInt(),
-            cacheHeight: ratioWH[1]?.toInt(),
-          );
+          child = _fileImage(_plainContent, ratioWH[0]?.toInt(), ratioWH[1]?.toInt(), placeholderWidth, placeholderHeight);
         } else {
           child = SizedBox(
             width: placeholderWidth,
@@ -803,13 +963,7 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
           );
         }
       } else if (_message.isContentFile) {
-        File file = _message.content as File;
-        child = Image.file(
-          file,
-          fit: BoxFit.cover,
-          cacheWidth: ratioWH[0]?.toInt(),
-          cacheHeight: ratioWH[1]?.toInt(),
-        );
+        child = _fileImage(_plainContent, ratioWH[0]?.toInt(), ratioWH[1]?.toInt(), placeholderWidth, placeholderHeight);
       } else {
         child = SizedBox(
           width: placeholderWidth,
@@ -989,12 +1143,7 @@ class _ChatBubbleState extends BaseStateFulWidgetState<ChatBubble> with Tag {
             ),
             color: Colors.black,
             child: (_thumbnailPath != null)
-                ? Image.file(
-                    File(_thumbnailPath!),
-                    fit: BoxFit.cover,
-                    cacheWidth: ratioWH[0]?.toInt(),
-                    cacheHeight: ratioWH[1]?.toInt(),
-                  )
+                ? _fileImage(_plainThumb, ratioWH[0]?.toInt(), ratioWH[1]?.toInt(), placeholderWidth, placeholderHeight)
                 : SizedBox(width: placeholderWidth, height: placeholderHeight),
           ),
           (durationText != null && durationText.isNotEmpty)

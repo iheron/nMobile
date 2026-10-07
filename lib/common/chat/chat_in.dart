@@ -5,6 +5,7 @@ import 'package:nmobile/common/locator.dart';
 import 'package:nmobile/common/settings.dart';
 import 'package:nmobile/helpers/error.dart';
 import 'package:nmobile/helpers/file.dart';
+import 'package:nmobile/helpers/file_crypto.dart';
 import 'package:nmobile/schema/contact.dart';
 import 'package:nmobile/schema/device_info.dart';
 import 'package:nmobile/schema/message.dart';
@@ -473,6 +474,7 @@ class ChatInCommon with Tag {
               String? fileExt = content['avatar'] != null ? content['avatar']['ext'] : FileHelper.DEFAULT_IMAGE_EXT;
               if (fileExt == null || fileExt.isEmpty) fileExt = FileHelper.DEFAULT_IMAGE_EXT;
               File? avatar = await FileHelper.convertBase64toFile(avatarData, (ext) => Path.getRandomFile(clientCommon.getPublicKey(), DirType.profile, subPath: received.targetId, fileExt: ext ?? fileExt));
+              if (avatar != null) await FileCrypto.encryptInPlace(avatar.path);
               avatarPath = Path.convert2Local(avatar?.path);
             } else {
               logger.w("$TAG - _receiveContact - avatar_data is empty - data:$data - sender:${received.sender}");
@@ -529,6 +531,7 @@ class ChatInCommon with Tag {
       } else {
         logger.i("$TAG - _receiveContactOptions - deviceToken same - sender:${received.sender} - new:$deviceToken - deviceInfo:$deviceInfo");
       }
+      if (content['silent'] == true) return false;
     } else {
       logger.e("$TAG - _receiveContactOptions - setNothing - data:$data - sender:${received.sender}");
       return false;
@@ -648,6 +651,7 @@ class ChatInCommon with Tag {
       logger.e("$TAG - _receiveImage - content is null - message:${received.toStringSimple()}");
       return false;
     }
+    await FileCrypto.encryptInPlace((received.content as File).path);
     // DB
     MessageSchema? inserted = await messageCommon.insert(received);
     bool isPieceCombine = received.options?[MessageOptions.KEY_FROM_PIECE] ?? false;
@@ -668,6 +672,7 @@ class ChatInCommon with Tag {
       logger.e("$TAG - _receiveAudio - content is null - message:${received.toStringSimple()}");
       return false;
     }
+    await FileCrypto.encryptInPlace((received.content as File).path);
     // DB
     MessageSchema? inserted = await messageCommon.insert(received);
     bool isPieceCombine = received.options?[MessageOptions.KEY_FROM_PIECE] ?? false;
@@ -702,6 +707,9 @@ class ChatInCommon with Tag {
     } else {
       // received.status = MessageStatus.Read; // modify in before
       received.content = await FileHelper.convertBase64toFile(received.content, (ext) => Path.getRandomFile(clientCommon.getPublicKey(), DirType.cache, fileExt: ext ?? parentType));
+      if (received.content is File) {
+        await FileCrypto.encryptInPlace((received.content as File).path);
+      }
       piece = await messageCommon.insert(received);
       if (piece != null) {
         pieces.add(piece);

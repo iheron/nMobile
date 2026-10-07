@@ -18,6 +18,7 @@ import 'package:nmobile/common/locator.dart';
 import 'package:nmobile/common/settings.dart';
 import 'package:nmobile/generated/l10n.dart';
 import 'package:nmobile/helpers/error.dart';
+import 'package:nmobile/helpers/file_crypto.dart';
 import 'package:nmobile/native/common.dart';
 import 'package:nmobile/native/crypto.dart';
 import 'package:nmobile/routes/routes.dart';
@@ -59,6 +60,7 @@ void main() async {
   application.registerInitialize(() async {
     Routes.init();
     await Settings.init();
+    await FileCrypto.clearTemp();
     await appCache.init();
     await Upgrade.run();
   });

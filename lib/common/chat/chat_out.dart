@@ -10,6 +10,7 @@ import 'package:nmobile/common/push/remote_notification.dart';
 import 'package:nmobile/common/settings.dart';
 import 'package:nmobile/helpers/error.dart';
 import 'package:nmobile/helpers/file.dart';
+import 'package:nmobile/helpers/file_crypto.dart';
 import 'package:nmobile/native/common.dart';
 import 'package:nmobile/schema/contact.dart';
 import 'package:nmobile/schema/device_info.dart';
@@ -759,8 +760,8 @@ class ChatOutCommon with Tag {
     return result != null;
   }
 
-  // NO topic (1 to 1)
-  Future<bool> sendContactOptionsToken(String? targetAddress, String? deviceToken) async {
+  // NO topic (1 to 1). silent: deliver the token without a chat row or session update.
+  Future<bool> sendContactOptionsToken(String? targetAddress, String? deviceToken, {bool silent = false}) async {
     if (targetAddress == null || targetAddress.isEmpty) return false;
     MessageSchema message = MessageSchema.fromSend(
       targetAddress,
@@ -771,9 +772,13 @@ class ChatOutCommon with Tag {
         "deviceToken": deviceToken,
       },
     );
-    message.content = MessageData.getContactOptionsToken(message.msgId, deviceToken); // same with receive and old version
+    message.content = MessageData.getContactOptionsToken(message.msgId, deviceToken, silent: silent); // same with receive and old version
     message.data = message.content;
-    logger.i("$TAG - sendContactOptionsToken - dest:$targetAddress - deviceToken:$deviceToken");
+    logger.i("$TAG - sendContactOptionsToken - dest:$targetAddress - silent:$silent - deviceToken:$deviceToken");
+    if (silent) {
+      Uint8List? pid = await _sendWithAddress([targetAddress], message.data);
+      return pid?.isNotEmpty == true;
+    }
     var result = await _sendVisible(message);
     return result != null;
   }
@@ -800,7 +805,7 @@ class ChatOutCommon with Tag {
           if (c.isMe) continue;
           if (!c.options.notificationOpen) continue;
           String? tok = after.deviceToken.isNotEmpty ? after.deviceToken : null;
-          await sendContactOptionsToken(c.address, tok);
+          await sendContactOptionsToken(c.address, tok, silent: true);
         }
         if (list.length < page) break;
         offset += page;
@@ -985,6 +990,10 @@ class ChatOutCommon with Tag {
     if (thumbnailPath != null && thumbnailPath.isNotEmpty) {
       message.options = MessageOptions.setIpfsThumbnailState(message.options, MessageOptions.ipfsThumbnailStateNo);
     }
+    await FileCrypto.encryptInPlace(content.path);
+    if (thumbnailPath != null && thumbnailPath.isNotEmpty) {
+      await FileCrypto.encryptInPlace(thumbnailPath);
+    }
     logger.i("$TAG - saveIpfs - targetId:$targetId - message:$message");
     MessageSchema? inserted = await insertMessage(message);
     if (inserted == null) return null;
@@ -1008,6 +1017,7 @@ class ChatOutCommon with Tag {
 
   Future<MessageSchema?> sendImage(dynamic target, File? content) async {
     if (content == null || (!await content.exists()) || ((await content.length()) <= 0)) return null;
+    await FileCrypto.encryptInPlace(content.path);
     // target
     String targetId = "";
     int targetType = 0;
@@ -1055,6 +1065,7 @@ class ChatOutCommon with Tag {
 
   Future<MessageSchema?> sendAudio(dynamic target, File? content, double? durationS) async {
     if (content == null || (!await content.exists()) || ((await content.length()) <= 0)) return null;
+    await FileCrypto.encryptInPlace(content.path);
     // target
     String targetId = "";
     int targetType = 0;
