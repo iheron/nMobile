@@ -101,7 +101,7 @@ void main() async {
         options.release = Settings.versionFormat;
         options.dsn = Settings.sentryDSN;
         options.autoInitializeNativeSdk = true;
-        options.enableTracing = true;
+        options.tracesSampleRate = 1.0;
         options.attachStacktrace = true;
         options.attachViewHierarchy = true;
         options.idleTimeout = Duration(seconds: 10);
@@ -117,7 +117,6 @@ void main() async {
         options.reportPackages = true;
         options.anrEnabled = true;
         options.reportSilentFlutterErrors = true;
-        options.autoAppStart = true;
         options.enableAutoNativeBreadcrumbs = true;
         options.enableUserInteractionBreadcrumbs = true;
         // options.beforeSend = (SentryEvent event, {Hint? hint}) {};

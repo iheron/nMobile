@@ -973,11 +973,11 @@ class _ChatMessagesScreenState extends BaseStateFulWidgetState<ChatMessagesScree
                           // no message_type(video/file), and result no mime_type from file_picker
                           // so big_file and video+file go with type_ipfs
                           if ((mimeType?.contains("image") == true) && (size <= Settings.piecesMaxSize)) {
-                            chatOutCommon.sendImage(this._target, File(path)); // await
+                            await chatOutCommon.sendImage(this._target, File(path));
                           } else if ((mimeType?.contains("audio") == true) && (size <= Settings.piecesMaxSize)) {
-                            chatOutCommon.sendAudio(this._target, File(path), durationS); // await
+                            await chatOutCommon.sendAudio(this._target, File(path), durationS);
                           } else {
-                            chatOutCommon.saveIpfs(this._target, result); // await
+                            await chatOutCommon.saveIpfs(this._target, result);
                           }
                         }
                       },

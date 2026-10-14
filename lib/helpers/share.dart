@@ -89,11 +89,11 @@ class ShareHelper {
       // no message_type(video/file), and result no mime_type from file_picker
       // so big_file and video+file go with type_ipfs
       if ((mimeType?.contains("image") == true) && (size <= Settings.piecesMaxSize)) {
-        chatOutCommon.sendImage(target, File(path)); // await
+        await chatOutCommon.sendImage(target, File(path));
       } else if ((mimeType?.contains("audio") == true) && (size <= Settings.piecesMaxSize)) {
-        chatOutCommon.sendAudio(target, File(path), durationS); // await
+        await chatOutCommon.sendAudio(target, File(path), durationS);
       } else {
-        chatOutCommon.saveIpfs(target, result); // await
+        await chatOutCommon.saveIpfs(target, result);
       }
       if (text.isEmpty && message.isNotEmpty) text = message;
     }

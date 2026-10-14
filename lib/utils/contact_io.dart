@@ -25,13 +25,19 @@ class ContactIO {
       // 2) Try save dialog (user picks path)
       try {
         final Uint8List bytes = Uint8List.fromList(utf8.encode(jsonText));
-        String? pickedPath = await FilePicker.platform.saveFile(
+        final Uri? saved = await FilePicker.saveFile(
           dialogTitle: 'Save contacts',
           fileName: fileName,
           type: FileType.custom,
           allowedExtensions: ['json'],
           bytes: bytes,
+          mimeType: 'application/json',
         );
+        final String? pickedPath = saved == null
+            ? null
+            : (saved.scheme == 'file'
+                ? saved.toFilePath()
+                : (saved.scheme.isEmpty ? saved.path : saved.toString()));
         if (pickedPath != null && pickedPath.isNotEmpty) {
           // On Android/iOS, file has been saved by the picker using provided bytes.
           // Some platforms still return the picked path; return it for consistency.

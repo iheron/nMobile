@@ -113,27 +113,26 @@ class _ContactHomeScreenState extends BaseStateFulWidgetState<ContactHomeScreen>
 
   Future<void> _importContacts() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        allowMultiple: false,
+      final PlatformFile? picked = await FilePicker.pickFile(
         type: Platform.isAndroid ? FileType.any : FileType.custom,
         allowedExtensions: Platform.isAndroid ? null : ["json"],
       );
-      if (result == null || result.files.isEmpty) return;
-      String? path = result.files.first.path;
+      if (picked == null) return;
+      String? path = picked.path;
       if (path == null) return;
-      File picked = File(path);
+      File file = File(path);
       if (!path.toLowerCase().endsWith('.json')) {
         if (!mounted) return;
         Toast.show(Settings.locale((s) => s.something_went_wrong, ctx: Settings.appContext));
         return;
       }
-      if (!await picked.exists()) {
+      if (!await file.exists()) {
         if (!mounted) return;
         Toast.show(Settings.locale((s) => s.file_not_exist, ctx: Settings.appContext));
         return;
       }
       Loading.show();
-      int imported = await ContactIO.importContactsFromJsonFile(picked);
+      int imported = await ContactIO.importContactsFromJsonFile(file);
       Loading.dismiss();
       if (!mounted) return;
       Toast.show('${Settings.locale((s) => s.success, ctx: Settings.appContext)} ($imported)');

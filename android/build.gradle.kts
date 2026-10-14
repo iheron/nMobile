@@ -50,8 +50,6 @@ subprojects {
                 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java).configureEach {
                     compilerOptions {
                         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
-                        languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
-                        apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
                     }
                 }
                 
@@ -68,6 +66,24 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+}
+
+// Runs after every plugin's own afterEvaluate, while compiler options are still mutable.
+// Kotlin 2.2 rejects language/api versions below 1.8; sentry_flutter still requests 1.6.
+gradle.projectsEvaluated {
+    subprojects {
+        tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java).configureEach {
+            val minKotlin = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
+            val lang = compilerOptions.languageVersion.orNull
+            if (lang != null && lang < minKotlin) {
+                compilerOptions.languageVersion.set(minKotlin)
+            }
+            val api = compilerOptions.apiVersion.orNull
+            if (api != null && api < minKotlin) {
+                compilerOptions.apiVersion.set(minKotlin)
+            }
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {
